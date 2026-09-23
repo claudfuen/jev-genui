@@ -100,7 +100,7 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
     allowed: SECTIONS,
     min: 1,
     repeatable: ["card"],
-    families: [["list", "table", "listings"], ["board", "list"], ["chat", "list"]],
+    families: [["list", "table", "listings"], ["board", "list"], ["chat", "list"], ["player", "list"]],
     noneAllowed: true,
     describe: (i) =>
       `Section ${i + 1} of up to 5, stacked top to bottom on the page. ${

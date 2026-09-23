@@ -130,3 +130,24 @@
     @apply font-sans;
     }
 }
+/* Jev's accent choice, scoped to the generated preview only. */
+.genui-preview {
+  --primary: var(--gp-l);
+  --primary-foreground: var(--gp-fg-l);
+  --ring: var(--gp-l);
+  --chart-1: var(--gp-c1);
+  --chart-2: var(--gp-c2);
+  --chart-3: var(--gp-c3);
+  --chart-4: var(--gp-c4);
+  --chart-5: var(--gp-c5);
+}
+.dark .genui-preview {
+  --primary: var(--gp-d);
+  --primary-foreground: var(--gp-fg-d);
+  --ring: var(--gp-d);
+}
+
+@keyframes jev-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}

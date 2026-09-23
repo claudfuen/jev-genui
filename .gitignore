@@ -37,3 +37,4 @@ next-env.d.ts
 
 # local agent launch config (reads the Gateway key from the macOS Keychain)
 .claude/
+.vercel

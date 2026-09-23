@@ -11,12 +11,58 @@ import {
 import type { Decision, Kind, RoundStat, UINode } from "./types"
 
 const MODEL = "typesafe-ai/jev"
-// Measured on 2026-09-23: 20 questions x 76 options returns in ~450ms, 30 x 76
-// is refused with a 503, and 80 x 20 takes ~2.9s. Shard well below both limits
-// and run the shards in parallel so a round costs one call's latency.
-const SHARD_OPTIONS = 700
-const SHARD_QUESTIONS = 16
+// Measured 2026-09-23 with SDK retries off: calls up to ~10 questions x 76
+// options always succeed (p50 ~280ms, p90 ~400ms); 16 x 40 fails with a 503
+// about half the time and 20 x 76 almost always does. Small calls still 503 now
+// and then, and roughly 1 in 30 hangs until a 504 at 30s. So: small shards run
+// in parallel, no SDK backoff (its 2s retry delay was the whole latency tail),
+// an immediate retry on failure, and a hedged duplicate when an attempt is slow.
+const SHARD_OPTIONS = 480
+const SHARD_QUESTIONS = 10
+const HEDGE_MS = 700
+const ATTEMPT_TIMEOUT_MS = 3000
+const MAX_ATTEMPTS = 4
 const MAX_ROUNDS = 5
+
+/** First success wins; failures retry at once; a slow attempt gets a hedged twin. */
+function robust<T>(run: (signal: AbortSignal) => Promise<T>, outer?: AbortSignal): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const ctrls: AbortController[] = []
+    let settled = false
+    let attempts = 0
+    let inflight = 0
+    let lastErr: unknown
+    let hedge: ReturnType<typeof setTimeout> | undefined
+    const finish = (fn: () => void) => {
+      if (settled) return
+      settled = true
+      clearTimeout(hedge)
+      ctrls.forEach((c) => c.abort())
+      fn()
+    }
+    const launch = () => {
+      if (settled || attempts >= MAX_ATTEMPTS) return
+      attempts++
+      inflight++
+      const ctrl = new AbortController()
+      ctrls.push(ctrl)
+      const signals = [ctrl.signal, AbortSignal.timeout(ATTEMPT_TIMEOUT_MS)]
+      if (outer) signals.push(outer)
+      run(AbortSignal.any(signals)).then(
+        (v) => finish(() => resolve(v)),
+        (err) => {
+          inflight--
+          lastErr = err
+          if (outer?.aborted) return finish(() => reject(err))
+          if (attempts < MAX_ATTEMPTS) launch()
+          else if (inflight === 0) finish(() => reject(lastErr))
+        },
+      )
+    }
+    launch()
+    hedge = setTimeout(launch, HEDGE_MS)
+  })
+}
 
 type Answer = { choice: string; probabilities?: Record<string, number> }
 
@@ -95,15 +141,10 @@ async function askSharded(state: string, qs: Q[], signal?: AbortSignal) {
   if (cur.length) shards.push(cur)
 
   const results = await Promise.all(
-    shards.map((shard) =>
-      evaluate({
-        model: MODEL,
-        state,
-        questions: Object.fromEntries(shard.map((q) => [q.key, q.question])),
-        maxRetries: 1,
-        abortSignal: signal,
-      }),
-    ),
+    shards.map((shard) => {
+      const questions = Object.fromEntries(shard.map((q) => [q.key, q.question]))
+      return robust((abortSignal) => evaluate({ model: MODEL, state, questions, maxRetries: 0, abortSignal }), signal)
+    }),
   )
   const answers = new Map<string, Answer>()
   for (const r of results) {

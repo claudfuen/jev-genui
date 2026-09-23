@@ -27,12 +27,16 @@ walk: every component kind, prop and piece of copy is a choice over options we s
   are not decisions; `lib/genui/sample.ts` seeds them from query + node path so they stay stable.
 - `components/inspector.tsx` shows every decision with its probability and runners-up.
 
-## Measured Jev limits (2026-09-23, from this Mac)
+## Measured Jev behavior (2026-09-23, SDK retries off)
 
-- One call is roughly 150ms at the provider and 250-600ms wall clock, with occasional 2.5s tails.
-- 20 questions x 76 options is fine; 30 x 76 returns a 503; 80 x 20 takes about 2.9s. The engine
-  shards at `SHARD_OPTIONS` / `SHARD_QUESTIONS` and runs shards in parallel. Re-measure before
-  raising either.
+- Successful calls: p50 ~280ms, p90 ~400ms wall clock from this Mac, including the Gateway.
+- Failure odds grow with call size: ~10 questions x 76 options always succeeds, 16 x 40 fails
+  with a 503 about half the time, 20 x 76 almost always fails. Small calls still 503 now and then,
+  and about 1 in 30 hangs until a 504 at 30s.
+- The AI SDK's default retry waits ~2s after a 503; that backoff was the entire latency tail.
+  The engine therefore shards small (`SHARD_OPTIONS`, `SHARD_QUESTIONS`), passes `maxRetries: 0`,
+  retries at once, and hedges a slow attempt (`robust()`). Re-measure before raising shard sizes.
+- Price: $0.042 per million input tokens, output free. A page is roughly 20k tokens.
 
 ## Rules
 

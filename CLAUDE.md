@@ -14,28 +14,44 @@ walk: every component kind, prop and piece of copy is a choice over options we s
 
 ## How a composition runs
 
-- `lib/genui/catalog.ts` is the grammar: which kinds each container allows per slot
-  (`GRAMMAR`), the detail questions per kind (`detailQuestions`), and every option bank.
-  Free text comes only from spans of the user's own words (`spansOf`) plus the banks.
-- `lib/genui/engine.ts` walks the tree breadth-first. Each round asks, in one parallel batch,
-  the props of nodes decided last round plus the kinds for their child slots. Depth is capped
-  by `MAX_DEPTH`, so a page takes 3-4 rounds.
-- Sibling questions are independent, so Jev answers identical questions identically. Distinct
-  answers come from `dedupeKey`: picks are reassigned greedily down each probability ranking.
-- `app/api/compose/route.ts` streams one NDJSON event per round, then `done`.
-- `components/genui/interpreter.tsx` maps nodes to shadcn components. Numbers, names and dates
-  are not decisions; `lib/genui/sample.ts` seeds them from query + node path so they stay stable.
-- `components/inspector.tsx` shows every decision with its probability and runners-up.
+- `lib/genui/banks.ts` is the whole vocabulary: every option Jev can pick. `lib/genui/catalog.ts`
+  is the grammar: which kinds each container allows per slot (`GRAMMAR`), the questions per kind
+  (`detailQuestions`), and questions that must wait for a node's own answers (`followUpQuestions`).
+- Three question shapes, each for one job. `choice` for exclusive picks (component kind, chart
+  type). A **set** is one `boolean` per candidate, keeping p >= 0.5 within min/max and honoring
+  `conflicts`: use it for anything plural (form fields, table columns, KPIs, FAQs). Never pick sets
+  slot by slot: sibling slots see identical questions, so Jev gives them all the same answer.
+- Joint options beat independent ones. A list's title and item type are one choice (`LIST_KINDS`),
+  alert text carries its tone, listings take their title from the item type, and tabs use their
+  content's title. Anything asked in parallel can disagree; anything that depends on a title is a
+  follow-up (table columns, detail rows, settings rows, sidebar links).
+- `lib/genui/engine.ts` walks the tree breadth-first, one parallel batch of Jev calls per round,
+  then applies choices (with page-wide dedupe), sets, and `repair()` for rules Jev cannot see
+  (line charts need a time axis). A shard that fails every retry degrades to defaults, not a blank page.
+- `app/api/compose/route.ts` streams one NDJSON event per round, then `done`; it takes user swaps
+  as `overrides` keyed `path|prop`.
+- `components/genui/interpreter.tsx` maps nodes to shadcn components. Numbers, names and dates are
+  not decisions; `lib/genui/sample.ts` seeds them from query + node path so they stay stable.
+- `components/inspector.tsx` shows every decision, set chips and clickable runners-up (swaps).
+
+## Measuring quality
+
+`bun scripts/eval.ts run --base <url> --label vN` composes a 42-prompt suite (25 realistic, 17 edge
+cases) through a deployed API; `bun scripts/eval.ts judge --a vN --b vM` has Claude Sonnet 5 (not
+Jev) grade four pass/fail criteria and compare head to head. Judge runs vary by about 10 points, so
+compare versions in the same judge run and repeat before trusting a small delta. Reports land in
+`evals/`; raw runs are gitignored. On 2026-09-23: v1 (first deploy) 26% pass, v10 74% (two judge
+passes averaged), v10 won 74 of 82 head-to-head judgments.
 
 ## Measured Jev behavior (2026-09-23, SDK retries off)
 
 - Successful calls: p50 ~280ms, p90 ~400ms wall clock from this Mac, including the Gateway.
-- Failure odds grow with call size: ~10 questions x 76 options always succeeds, 16 x 40 fails
-  with a 503 about half the time, 20 x 76 almost always fails. Small calls still 503 now and then,
-  and about 1 in 30 hangs until a 504 at 30s.
-- The AI SDK's default retry waits ~2s after a 503; that backoff was the entire latency tail.
-  The engine therefore shards small (`SHARD_OPTIONS`, `SHARD_QUESTIONS`), passes `maxRetries: 0`,
-  retries at once, and hedges a slow attempt (`robust()`). Re-measure before raising shard sizes.
+- The size limit is input characters, not option count: 760 short options pass, while 167 options
+  with sentence-long descriptions 503 often. Shards are budgeted by characters (`SHARD_CHARS`).
+- 503s also come in provider-side bursts that hit even one-question calls. The AI SDK's default
+  retry waits ~2s after a 503 (that was the whole early latency tail), so the engine passes
+  `maxRetries: 0`, retries with short jittered backoff, and hedges slow attempts (`robust()`).
+- Concurrency is not the problem: 24 parallel calls produced one error.
 - Price: $0.042 per million input tokens, output free. A page is roughly 20k tokens.
 
 ## Rules

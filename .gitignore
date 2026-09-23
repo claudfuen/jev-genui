@@ -38,3 +38,6 @@ next-env.d.ts
 # local agent launch config (reads the Gateway key from the macOS Keychain)
 .claude/
 .vercel
+
+# raw eval runs (reports are committed)
+evals/*.json

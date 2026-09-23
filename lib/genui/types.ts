@@ -1,17 +1,45 @@
 export type Kind =
   | "page"
-  | "hero"
-  | "card"
+  // containers
   | "grid"
   | "split"
   | "tabs"
+  | "card"
+  | "row"
+  // section molecules
+  | "hero"
+  | "stats"
   | "form"
   | "chart"
   | "table"
   | "list"
+  | "board"
+  | "chat"
+  | "player"
+  | "pricing"
+  | "profile"
+  | "details"
+  | "listings"
+  | "search"
+  | "settings"
+  | "features"
+  | "steps"
+  | "testimonial"
+  | "cta"
+  | "timeline"
   | "accordion"
   | "alert"
   | "calendar"
+  | "empty"
+  | "swipe"
+  | "keypad"
+  | "forecast"
+  // tiles
+  | "media"
+  | "feature"
+  | "person"
+  // atoms
+  | "heading"
   | "stat"
   | "text"
   | "progress"
@@ -24,6 +52,13 @@ export type Kind =
   | "avatars"
   | "image"
   | "separator"
+  | "price"
+  | "rating"
+  | "status"
+  | "segmented"
+  | "searchbox"
+  | "otp"
+  | "quantity"
 
 export type PropValue = string | number | boolean | string[]
 
@@ -33,8 +68,10 @@ export type Decision = {
   choice: string
   probability: number | null
   alternatives: { option: string; p: number }[]
-  /** Set when the raw top pick was replaced (sibling dedupe, minimum counts). */
+  /** Set when the raw top pick was replaced (sibling dedupe, minimum counts, a user swap). */
   note?: string
+  /** For set questions: every candidate Jev rated, highest first. */
+  set?: { item: string; p: number; picked: boolean }[]
 }
 
 export type UINode = {
@@ -53,6 +90,9 @@ export type UINode = {
 }
 
 export type RoundStat = { round: number; ms: number; questions: number; calls: number }
+
+/** User swaps, keyed `${path}|${prop}` (prop "kind" replaces the component itself). */
+export type Overrides = Record<string, string>
 
 export type ComposeEvent =
   | { type: "round"; tree: UINode; stat: RoundStat }

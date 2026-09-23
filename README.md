@@ -19,7 +19,25 @@ Each round is one parallel batch of `choice` questions against the request and t
 The answers form a component tree, and the interpreter maps it onto shadcn/ui. Every choice,
 with its probability and the runners-up, is visible in the Decisions panel.
 
-A typical page takes 3 to 4 rounds, about one second.
+Plural things (form fields, table columns, KPIs) are picked with one yes/no question per
+candidate, so candidates never compete. Anything that depends on another answer waits a round:
+a table picks its columns after it has a title.
+
+A typical page takes 2 to 3 rounds, under a second.
+
+## Play with it
+
+- **Swap:** every decision in the panel lists Jev's runners-up. Click one to swap it in.
+- **Inspect:** click any component in the preview to jump to the choices behind it.
+- **Confidence overlay:** outlines each component green, amber or red by how sure Jev was.
+- **Share:** the URL carries your prompt (`?q=`).
+
+## How good is it?
+
+`scripts/eval.ts` runs 42 prompts, from "kanban board for a design team" to "asdfghjkl" and
+prompt injections, and has an independent model grade each result on four pass/fail criteria.
+The first version passed 26%; the current one passes 74% and wins 74 of 82 head-to-head
+judgments against it.
 
 ## Run it
 

@@ -1,5 +1,5 @@
 import { compose } from "@/lib/genui/engine"
-import type { ComposeEvent, RoundStat, UINode } from "@/lib/genui/types"
+import type { ComposeEvent, Overrides, RoundStat, UINode } from "@/lib/genui/types"
 
 export const maxDuration = 30
 
@@ -32,12 +32,20 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null)
   const raw = typeof body?.query === "string" ? body.query : ""
   const query = raw.trim().replace(/\s+/g, " ").slice(0, MAX_QUERY)
-  if (!query) return Response.json({ error: "Type something first." }, { status: 400 })
+  // A single character is the first keystroke of every prompt, not a request.
+  if ([...query].length < 2) return Response.json({ error: "Keep typing..." }, { status: 400 })
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local"
   if (limited(ip)) return Response.json({ error: "Slow down a little, then try again." }, { status: 429 })
 
-  const key = query.toLowerCase()
+  // User swaps: at most 20 short "path|prop" -> value pairs.
+  const overrides: Overrides = {}
+  if (body?.overrides && typeof body.overrides === "object") {
+    for (const [k, v] of Object.entries(body.overrides).slice(0, 20)) {
+      if (typeof v === "string" && k.length < 40 && v.length < 80 && /^[\d.]*\|[a-zA-Z]+$/.test(k)) overrides[k] = v
+    }
+  }
+  const key = `${query.toLowerCase()}::${JSON.stringify(Object.entries(overrides).sort())}`
   const encoder = new TextEncoder()
   const stream = new ReadableStream({
     async start(controller) {
@@ -52,6 +60,7 @@ export async function POST(req: Request) {
       try {
         const { tree, rounds } = await compose(query, {
           signal: req.signal,
+          overrides,
           onRound: (t, stat) => send({ type: "round", tree: t, stat }),
         })
         const entry = { tree, rounds, totalMs: Date.now() - started }

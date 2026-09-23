@@ -79,6 +79,9 @@ const METRIC_SPECS: Record<string, MetricSpec> = {
   "Calories burned": { fmt: "unit", lo: 180, hi: 2400, unit: "kcal" },
   "Hours logged": { fmt: "unit", lo: 12, hi: 160, unit: "h" },
   NPS: { fmt: "count", lo: 24, hi: 72 },
+  Sleep: { fmt: "unit", lo: 5, hi: 9, unit: "h" },
+  "UV index": { fmt: "count", lo: 2, hi: 11 },
+  Donations: { fmt: "currency", lo: 2000, hi: 90000 },
 }
 
 export function metricSpec(label: string): MetricSpec {
@@ -157,7 +160,7 @@ export type Cell = { text: string; badge?: "default" | "secondary" | "outline" |
 export function cell(r: Rand, col: string, row: number): Cell {
   const person = PEOPLE[(row * 5 + Math.floor(r() * 3)) % PEOPLE.length]
   switch (col) {
-    case "Name": case "Customer": case "Assignee":
+    case "Name": case "Customer": case "Client": case "Assignee":
       return { text: person }
     case "Email":
       return { text: `${person.split(" ")[0].toLowerCase()}@example.com` }
@@ -203,6 +206,16 @@ export function cell(r: Rand, col: string, row: number): Cell {
       return { text: pick(r, COMPANIES) }
     case "Rating":
       return { text: `${between(r, 3.8, 5).toFixed(1)}` }
+    case "Service":
+      return { text: pick(r, ["API", "Web app", "Database", "Auth", "Payments", "Search", "CDN"]) }
+    case "Ticket":
+      return { text: `#T-${2041 + row * 3}` }
+    case "Symbol":
+      return { text: ["BTC", "ETH", "SOL", "USDC", "AVAX", "LINK"][row % 6] }
+    case "Change": {
+      const v = between(r, -6, 9)
+      return { text: `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, badge: v >= 0 ? "secondary" : "destructive" }
+    }
     default:
       return { text: "..." }
   }
@@ -233,6 +246,27 @@ export function listItems(r: Rand, kind: string, n = 4): ListItem[] {
         const d = new Date(2026, 8, 24 + i * 3)
         return { title: EVENTS[(i + Math.floor(r() * 4)) % EVENTS.length], meta: `${d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} at ${pick(r, ["9:00", "11:30", "2:00", "6:30"])}` }
       }
+      case "apps": {
+        const apps = ["Slack", "Google Calendar", "Stripe", "GitHub", "Notion", "Zapier", "HubSpot", "Figma"]
+        const name = apps[(i * 2 + Math.floor(r() * 2)) % apps.length]
+        return { title: name, meta: i % 2 ? "Not connected" : "Connected", trailing: i % 2 ? "Connect" : "Manage" }
+      }
+      case "services": {
+        const svcs = ["API", "Web app", "Database", "Auth", "Payments", "Search", "CDN", "Email"]
+        const bad = r() < 0.15
+        return { title: svcs[(i + Math.floor(r() * 3)) % svcs.length], meta: bad ? "Degraded performance" : `${between(r, 99.9, 100).toFixed(2)}% uptime`, trailing: bad ? "Degraded" : "Operational", positive: !bad }
+      }
+      case "holdings": {
+        const coins = [["Bitcoin", "BTC"], ["Ethereum", "ETH"], ["Solana", "SOL"], ["Apple", "AAPL"], ["Nvidia", "NVDA"], ["USD Coin", "USDC"]]
+        const [name, sym] = coins[(i + Math.floor(r() * 2)) % coins.length]
+        const ch = between(r, -6, 9)
+        return { title: name, meta: `${between(r, 0.1, 40).toFixed(2)} ${sym}`, trailing: `${ch >= 0 ? "+" : ""}${ch.toFixed(1)}%`, positive: ch >= 0 }
+      }
+      case "tracks": {
+        const t = TRACKS.music[i % TRACKS.music.length]
+        return { title: t.title, meta: t.by, trailing: t.length }
+      }
+      case "transactions":
       default: {
         const out = r() < 0.4
         return { title: MERCHANTS[(i * 3 + Math.floor(r() * 3)) % MERCHANTS.length], meta: pick(r, ["Today", "Yesterday", "Sep 20", "Sep 18"]), trailing: `${out ? "-" : "+"}$${between(r, 20, 2400).toFixed(2)}`, positive: !out }
@@ -281,5 +315,181 @@ export const FIELD_PLACEHOLDERS: Record<string, string> = {
   Website: "https://", Address: "123 Main St", City: "Miami", "Zip code": "33101",
   Username: "janecooper", Subject: "How can we help?", "Card number": "1234 5678 9012 3456",
   "Expiry date": "MM / YY", CVC: "123", "Name on card": "Jane Cooper", "Promo code": "SAVE20",
-  Quantity: "1", "Project name": "Website redesign", Location: "Miami, FL", Amount: "0.00",
+  Quantity: "1", Title: "What needs doing?", "Project name": "Website redesign", Location: "Miami, FL", Amount: "0.00",
 }
+
+// ---------------------------------------------------------------------------
+// Section molecules
+
+export const BOARD_CARDS: Record<string, string[]> = {
+  "product work": ["Redesign onboarding", "Fix login bug", "Dark mode", "Update pricing page", "API rate limits", "Mobile navigation", "Export to CSV", "Search filters", "Team roles"],
+  hiring: PEOPLE.slice(0, 9),
+  "sales deals": ["Northwind, 40 seats", "Globex renewal", "Initech pilot", "Vandelay expansion", "Brightline, 12 seats", "Summit Labs", "Bluefin annual", "Parallel trial", "Acme upgrade"],
+  "content calendar": ["Launch announcement", "Customer story", "Weekly newsletter", "How-to video", "Case study", "Podcast episode", "Behind the scenes", "Product tips", "Year in review"],
+  "support tickets": ["Cannot reset password", "Refund request", "Invoice missing", "App crashes on start", "Change my plan", "Shipping delay", "Add a teammate", "Wrong size", "Double charged"],
+  "orders to fulfil": ["#1042, 2 items", "#1043, 1 item", "#1044, 5 items", "#1045, 3 items", "#1046, 1 item", "#1047, 2 items", "#1048, 4 items", "#1049, 1 item", "#1050, 2 items"],
+}
+
+export type ChatLine = { me: boolean; text: string }
+export const CHAT_SCRIPTS: Record<string, ChatLine[]> = {
+  support: [
+    { me: false, text: "Hi! My order hasn't arrived and tracking hasn't moved in three days." },
+    { me: true, text: "Sorry about that. Could you share your order number?" },
+    { me: false, text: "Sure, it's #1042." },
+    { me: true, text: "Thanks! It's at the local depot and out for delivery tomorrow morning." },
+  ],
+  assistant: [
+    { me: true, text: "Can you summarize this week for me?" },
+    { me: false, text: "Sure. You're up 12% on last week, mostly from weekend traffic. Want a breakdown?" },
+    { me: true, text: "Yes, the top three drivers please." },
+    { me: false, text: "1. Returning customers  2. The new landing page  3. Email campaign clicks" },
+  ],
+  team: [
+    { me: false, text: "Standup in five, anyone blocked?" },
+    { me: true, text: "All good here, shipping the pricing page today." },
+    { me: false, text: "Could someone review #482 when they have a minute?" },
+    { me: true, text: "On it." },
+  ],
+  sales: [
+    { me: false, text: "Hi, we're a team of 40 looking at your Team plan." },
+    { me: true, text: "Great to hear! Want me to set up a 14-day trial for everyone?" },
+    { me: false, text: "Yes please, and a quote for annual billing." },
+    { me: true, text: "Done. The quote is in your inbox." },
+  ],
+  friends: [
+    { me: false, text: "Dinner Friday?" },
+    { me: true, text: "Yes! Where?" },
+    { me: false, text: "That new taco place downtown" },
+    { me: true, text: "Perfect, 7pm?" },
+  ],
+  booking: [
+    { me: false, text: "Hi, do you have a table for four this Saturday at 8?" },
+    { me: true, text: "We do! Indoor or outdoor?" },
+    { me: false, text: "Outdoor please." },
+    { me: true, text: "You're booked. See you Saturday at 8!" },
+  ],
+}
+
+export const TRACKS: Record<string, { title: string; by: string; length: string }[]> = {
+  music: [
+    { title: "Midnight Drive", by: "Neon Coast", length: "3:42" }, { title: "Golden Hour", by: "Luma", length: "4:05" },
+    { title: "Paper Planes", by: "The Wavelengths", length: "3:18" }, { title: "Slow Tide", by: "Harbor Lights", length: "5:01" },
+  ],
+  podcast: [
+    { title: "Ep. 42: Building in public", by: "The Founders Show", length: "48:12" }, { title: "Ep. 41: Pricing is a product", by: "The Founders Show", length: "52:40" },
+    { title: "Ep. 40: Hiring your first ten", by: "The Founders Show", length: "45:03" }, { title: "Ep. 39: Saying no", by: "The Founders Show", length: "39:27" },
+  ],
+  audiobook: [
+    { title: "Chapter 3: The Harbor", by: "A. Rivers", length: "32:10" }, { title: "Chapter 4: Low Tide", by: "A. Rivers", length: "28:44" },
+    { title: "Chapter 5: The Letter", by: "A. Rivers", length: "35:02" }, { title: "Chapter 6: North", by: "A. Rivers", length: "30:19" },
+  ],
+  video: [
+    { title: "Lesson 4: Your first project", by: "Getting started", length: "12:30" }, { title: "Lesson 5: Working with data", by: "Getting started", length: "15:12" },
+    { title: "Lesson 6: Sharing your work", by: "Getting started", length: "9:48" }, { title: "Lesson 7: Next steps", by: "Getting started", length: "7:05" },
+  ],
+}
+
+export function tierPrices(tiers: string[], period: string): string[] {
+  const base = [9, 29, 79]
+  return tiers.map((t, i) => {
+    if (/free|hobby/i.test(t) && i === 0) return "$0"
+    if (/enterprise/i.test(t)) return "Custom"
+    const v = /drop-in/i.test(t) ? 25 : /10-class/i.test(t) ? 199 : /unlimited/i.test(t) ? 149 : base[i] ?? 99
+    return `$${period === "year" ? v * 10 : v}`
+  })
+}
+
+export const PROFILES: Record<string, { name: string; role: string; location: string; stats: [string, string][] }> = {
+  professional: { name: "Olivia Martin", role: "Head of Operations at Northwind", location: "New York", stats: [["Connections", "500+"], ["Projects", "42"], ["Years", "12"]] },
+  creator: { name: "Mia Chen", role: "Food and travel creator", location: "Lisbon", stats: [["Followers", "284K"], ["Posts", "1,204"], ["Following", "312"]] },
+  developer: { name: "Arjun Mehta", role: "Staff engineer and open source maintainer", location: "Toronto", stats: [["Repos", "86"], ["Stars", "12.4K"], ["Followers", "3.1K"]] },
+  designer: { name: "Chloe Dubois", role: "Product designer and illustrator", location: "Berlin", stats: [["Shots", "214"], ["Likes", "48K"], ["Followers", "9.8K"]] },
+  athlete: { name: "Mateo Rossi", role: "Marathon runner and coach", location: "Miami", stats: [["Races", "38"], ["Best", "2:41"], ["Athletes", "120"]] },
+  musician: { name: "Ava Patel", role: "DJ and producer", location: "London", stats: [["Listeners", "1.2M"], ["Tracks", "64"], ["Shows", "210"]] },
+  doctor: { name: "Dr. William Kim", role: "Family physician", location: "Chicago", stats: [["Patients", "2,400"], ["Rating", "4.9"], ["Years", "15"]] },
+  teacher: { name: "Sofia Davis", role: "Math tutor", location: "Austin", stats: [["Students", "340"], ["Lessons", "2,100"], ["Rating", "5.0"]] },
+  chef: { name: "Lucas Brown", role: "Chef and cookbook author", location: "Mexico City", stats: [["Recipes", "412"], ["Followers", "96K"], ["Rating", "4.8"]] },
+  host: { name: "Emma Wilson", role: "Superhost", location: "Lisbon", stats: [["Reviews", "318"], ["Rating", "4.97"], ["Years hosting", "6"]] },
+}
+
+const KV_FIXED: Record<string, string> = {
+  "Order number": "#1042", "Delivery date": "Sep 28", Carrier: "UPS", "Tracking number": "1Z 999 AA1 0123 4567",
+  "Payment method": "Visa ending 4242", Plan: "Pro", "Billing cycle": "Monthly", "Next payment": "Oct 23, 2026",
+  "Member since": "March 2024", Email: "olivia@example.com", Phone: "+1 (555) 014-2231", Location: "Miami, FL",
+  Status: "Active", Bedrooms: "3", Bathrooms: "2", "Square feet": "1,850", "Year built": "2016", Parking: "2 spaces",
+  "Check-in": "Fri, Sep 26 from 3:00 PM", "Check-out": "Mon, Sep 29 by 11:00 AM", Guests: "2 adults", "Room type": "King suite",
+  Duration: "6 weeks", Level: "Beginner", Instructor: "Sofia Davis", Language: "English", Certificate: "Included",
+  Symbol: "BTC", "Market cap": "$1.2T", Volume: "$38.4B", "52-week high": "$74,210",
+}
+
+/** Values for label/value rows, with money rows that add up. */
+export function kvValues(r: Rand, keys: string[]): Record<string, string> {
+  const subtotal = Math.round(between(r, 60, 480))
+  const shipping = r() < 0.3 ? 0 : 8
+  const discount = keys.includes("Discount") ? Math.round(subtotal * 0.1) : 0
+  const tax = Math.round((subtotal - discount) * 0.08)
+  const money = (v: number) => `$${v.toFixed(2)}`
+  const out: Record<string, string> = {}
+  for (const k of keys) {
+    if (k === "Subtotal") out[k] = money(subtotal)
+    else if (k === "Shipping") out[k] = shipping ? money(shipping) : "Free"
+    else if (k === "Discount") out[k] = `-${money(discount)}`
+    else if (k === "Tax") out[k] = money(tax)
+    else if (k === "Total") out[k] = money(subtotal + shipping - discount + (keys.includes("Tax") ? tax : 0))
+    else out[k] = KV_FIXED[k] ?? "..."
+  }
+  return out
+}
+
+export type Listing = { title: string; meta: string; price?: string; rating?: number; reviews?: number; badge?: string; icon: string }
+const LISTINGS: Record<string, { icon: string; titles: string[]; meta: string[]; price?: (r: Rand) => string; rated: boolean; badges: string[] }> = {
+  products: { icon: "package", titles: ["Classic sneaker", "Everyday tote", "Wool beanie", "Canvas backpack", "Linen shirt", "Water bottle"], meta: ["Unisex", "3 colors", "Organic cotton", "Free returns"], price: (r) => `$${Math.round(between(r, 18, 160))}`, rated: true, badges: ["New", "Best seller", "Sale"] },
+  homes: { icon: "home", titles: ["Sunny loft near the park", "Modern townhouse", "Garden apartment", "Ocean view condo", "Craftsman bungalow", "Corner studio"], meta: ["3 bd · 2 ba · 1,850 sqft", "2 bd · 1 ba · 980 sqft", "4 bd · 3 ba · 2,400 sqft", "1 bd · 1 ba · 720 sqft"], price: (r) => `$${(Math.round(between(r, 320, 1400)) * 1000).toLocaleString("en-US")}`, rated: false, badges: ["New listing", "Open house", "Price drop"] },
+  hotels: { icon: "bed", titles: ["The Harbor Hotel", "Casa Luz", "The Palms Resort", "Hotel Nord", "Seaside Inn", "The Grand"], meta: ["Downtown · 0.4 mi from center", "Beachfront", "Old town", "Near the airport"], price: (r) => `$${Math.round(between(r, 89, 420))} / night`, rated: true, badges: ["Free cancellation", "Breakfast included", "Great value"] },
+  courses: { icon: "graduation-cap", titles: ["Intro to the basics", "Level up in 30 days", "Masterclass", "Weekend bootcamp", "Advanced techniques", "Foundations"], meta: ["6 lessons · Beginner", "12 lessons · Intermediate", "4 hours · All levels"], price: (r) => `$${Math.round(between(r, 19, 199))}`, rated: true, badges: ["Bestseller", "New", "Certificate"] },
+  recipes: { icon: "utensils", titles: ["Lemon herb chicken", "Spicy miso ramen", "Summer salad", "Banana bread", "Veggie tacos", "Overnight oats"], meta: ["35 min · Easy", "20 min · Easy", "1 hr · Medium"], rated: true, badges: ["Vegan", "Quick", "Kid friendly"] },
+  events: { icon: "ticket", titles: ["Sunset Jazz Night", "Makers Market", "Rooftop Cinema", "Tech Meetup", "Wine Tasting", "Morning Run Club"], meta: ["Fri, Sep 26 · 8:00 PM", "Sat, Sep 27 · 10:00 AM", "Sun, Sep 28 · 7:30 PM"], price: (r) => (r() < 0.2 ? "Free" : `$${Math.round(between(r, 10, 80))}`), rated: false, badges: ["Selling fast", "Free", "New"] },
+  articles: { icon: "file", titles: ["How we doubled bookings", "A guide for beginners", "What we learned this year", "10 tips from the pros", "Behind the scenes", "The complete checklist"], meta: ["5 min read · Sep 18", "8 min read · Sep 11", "3 min read · Sep 4"], rated: false, badges: ["Popular", "New", "Guide"] },
+  cars: { icon: "car", titles: ["2022 Model 3 Long Range", "2021 Civic Sport", "2023 RAV4 Hybrid", "2020 Mustang GT", "2022 Ioniq 5", "2019 Wrangler"], meta: ["18k mi · Electric", "32k mi · Gas", "9k mi · Hybrid"], price: (r) => `$${(Math.round(between(r, 18, 58)) * 1000).toLocaleString("en-US")}`, rated: false, badges: ["Certified", "Low miles", "Great deal"] },
+  restaurants: { icon: "utensils", titles: ["Casa Verde", "Sakura House", "The Grill Room", "Pasta Bar", "Green Bowl", "Taqueria Sol"], meta: ["Mexican · $$ · 0.8 mi", "Japanese · $$$ · 1.2 mi", "Italian · $$ · 0.5 mi"], rated: true, badges: ["Open now", "Outdoor seating", "Popular"] },
+  jobs: { icon: "briefcase", titles: ["Senior Product Designer", "Frontend Engineer", "Marketing Lead", "Customer Success Manager", "Data Analyst", "Head of Sales"], meta: ["Remote · Full-time", "New York · Hybrid", "Miami · On-site"], price: (r) => `$${Math.round(between(r, 90, 180))}k to $${Math.round(between(r, 180, 240))}k`, rated: false, badges: ["New", "Urgent", "Remote"] },
+  dishes: { icon: "utensils", titles: ["Margherita", "Spicy salami", "Truffle mushroom", "Four cheese", "Garden veggie", "Burrata special"], meta: ["Tomato, mozzarella, basil", "Salami, chili honey", "Mushrooms, truffle oil", "Four Italian cheeses"], price: (r) => `$${Math.round(between(r, 11, 24))}`, rated: true, badges: ["Popular", "Vegetarian", "Spicy"] },
+  services: { icon: "user-plus", titles: ["GreenCut Lawn Care", "Sparkle Cleaning Co.", "Handy Hank", "Blue Wave Pools", "Swift Movers", "Paws and Walks"], meta: ["2.1 mi · Available today", "0.8 mi · Next slot 3:00 PM", "3.4 mi · Available tomorrow"], price: (r) => `from $${Math.round(between(r, 25, 120))}`, rated: true, badges: ["Top pro", "Fast response", "Background checked"] },
+  workshops: { icon: "calendar", titles: ["Intro to ceramics", "Sourdough basics", "Portrait photography", "Watercolor weekend", "Knife skills", "Public speaking"], meta: ["Sat, Oct 4 · 10:00 AM · 8 spots left", "Sun, Oct 12 · 2:00 PM · 3 spots left", "Thu, Oct 16 · 6:30 PM · 12 spots left"], price: (r) => `$${Math.round(between(r, 35, 180))}`, rated: true, badges: ["Few spots left", "New", "Beginner friendly"] },
+  classes: { icon: "dumbbell", titles: ["Sunrise flow", "Power hour", "Beginner basics", "Evening stretch", "Strength circuit", "Weekend intensive"], meta: ["Mon, Wed · 7:00 AM", "Tue, Thu · 6:00 PM", "Sat · 9:00 AM"], price: (r) => `$${Math.round(between(r, 15, 40))}`, rated: true, badges: ["Beginner", "Popular", "Few spots left"] },
+}
+
+export function listings(r: Rand, type: string, n: number): Listing[] {
+  const spec = LISTINGS[type] ?? LISTINGS.products
+  const start = Math.floor(r() * spec.titles.length)
+  return Array.from({ length: n }, (_, i) => ({
+    title: spec.titles[(start + i) % spec.titles.length],
+    meta: spec.meta[(start + i) % spec.meta.length],
+    price: spec.price?.(r),
+    rating: spec.rated ? +between(r, 4.1, 4.95).toFixed(1) : undefined,
+    reviews: spec.rated ? Math.round(between(r, 24, 2400)) : undefined,
+    badge: i === 0 || r() < 0.25 ? pick(r, spec.badges) : undefined,
+    icon: spec.icon,
+  }))
+}
+
+export const TIMELINE_ENTRIES: Record<string, [string, string][]> = {
+  "order tracking": [["Out for delivery", "Today, 8:02 AM"], ["Arrived at local depot", "Yesterday, 9:40 PM"], ["Shipped from warehouse", "Sep 21, 4:30 PM"], ["Order placed", "Sep 20, 9:14 AM"]],
+  "project activity": [["Olivia merged the pricing page", "2h ago"], ["Jackson commented on Onboarding", "4h ago"], ["Mia moved Dark mode to Done", "Yesterday"], ["Arjun started Sprint 14", "2 days ago"]],
+  changelog: [["v2.4: Dark mode and faster search", "Sep 18"], ["v2.3: Team roles and permissions", "Sep 4"], ["v2.2: Export to CSV", "Aug 21"], ["v2.1: A new dashboard", "Aug 7"]],
+  itinerary: [["Day 1: Arrive and check in", "Fri, Sep 26"], ["Day 2: Old town walking tour", "Sat, Sep 27"], ["Day 3: Beach and sunset cruise", "Sun, Sep 28"], ["Day 4: Fly home", "Mon, Sep 29"]],
+  "account history": [["Upgraded to Pro", "Sep 12"], ["Payment received, $29.00", "Sep 12"], ["Added 3 team members", "Aug 30"], ["Account created", "Aug 2"]],
+  "incident log": [["Resolved: all systems normal", "10:42 AM"], ["Monitoring: fix deployed", "10:15 AM"], ["Identified: database failover", "9:58 AM"], ["Investigating: elevated errors", "9:41 AM"]],
+}
+
+export const SWIPE_CARDS: Record<string, { title: string; meta: string; tags: string[]; icon: string }[]> = {
+  people: [{ title: "Sofia, 29", meta: "Designer · 3 miles away", tags: ["Hiking", "Coffee", "Dogs"], icon: "heart" }],
+  pets: [{ title: "Biscuit, 2", meta: "Golden retriever · 1.2 miles away", tags: ["Playful", "Good with kids", "Vaccinated"], icon: "paw" }],
+  homes: [{ title: "Bright loft in Wynwood", meta: "$2,300 / month · 1 bd", tags: ["Pet friendly", "Parking", "Gym"], icon: "home" }],
+  jobs: [{ title: "Product Designer at Northwind", meta: "Remote · $140k", tags: ["Full-time", "Equity", "Health"], icon: "briefcase" }],
+  recipes: [{ title: "Spicy miso ramen", meta: "30 min · 620 kcal", tags: ["Vegan", "Quick", "Spicy"], icon: "utensils" }],
+  products: [{ title: "Classic white sneakers", meta: "$89 · Free returns", tags: ["New", "Unisex", "Leather"], icon: "shirt" }],
+  restaurants: [{ title: "Casa Verde", meta: "Mexican · $$ · 0.8 mi", tags: ["Open now", "Outdoor", "Tacos"], icon: "utensils" }],
+}
+
+export const PRICE_RANGES: Record<string, [number, number]> = { budget: [4, 19], mid: [24, 180], premium: [240, 1800], luxury: [2400, 12000] }

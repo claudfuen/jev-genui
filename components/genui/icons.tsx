@@ -1,12 +1,12 @@
 import {
-  Activity, Award, BarChart3, Bed, Bell, Bike, Bitcoin, BookOpen, Briefcase, Bug, Calendar,
+  Activity, Anchor, Award, BarChart3, Bed, Bell, Bike, Bitcoin, BookOpen, Briefcase, Bug, Calendar,
   Camera, Car, CircleCheck, Clock, Cloud, CloudRain, Code, Coffee, Cpu, CreditCard, DollarSign,
-  Droplets, Dumbbell, Eye, FileText, Flame, Folder, Footprints, Gem, Gift, GitBranch, Globe,
-  GraduationCap, Headphones, Heart, House, Image, Inbox, Landmark, Leaf, Lock, Mail, MapPin,
-  MessageSquare, Mic, Mountain, MousePointerClick, Music, Package, Percent, Phone, PieChart,
-  PiggyBank, Pill, Plane, Receipt, Rocket, Send, Server, Settings, Shield, Shirt, ShoppingCart,
-  Sparkles, Star, Stethoscope, Store, Sun, Tag, Target, Terminal, Thermometer, Ticket, Timer,
-  TrendingUp, Trophy, Truck, UserPlus, Users, Utensils, Video, Wallet, Wind, Zap,
+  Download, Droplets, Dumbbell, Eye, FileText, Flame, Folder, Footprints, Gem, Gift, GitBranch, Globe,
+  GraduationCap, Headphones, Heart, House, Image, Inbox, Landmark, LayoutGrid, Leaf, Lock, Mail, MapPin,
+  MessageSquare, Mic, Moon, Mountain, MousePointerClick, Music, Package, Percent, Phone, PieChart,
+  PawPrint, PiggyBank, Pill, Plane, Receipt, Rocket, Send, Server, Settings, Shield, Shirt, ShoppingCart,
+  Search, Sparkles, Star, Stethoscope, Store, Sun, Tag, Target, Terminal, Thermometer, Ticket, Timer,
+  TrendingDown, TrendingUp, Trophy, Truck, UserPlus, Users, Utensils, Video, Wallet, Wind, Zap,
   type LucideIcon,
 } from "lucide-react"
 
@@ -28,6 +28,8 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   "mouse-pointer": MousePointerClick, "user-plus": UserPlus, store: Store, camera: Camera,
   shirt: Shirt, gem: Gem, bitcoin: Bitcoin, landmark: Landmark, mountain: Mountain, bike: Bike,
   timer: Timer, "check-circle": CircleCheck, inbox: Inbox, send: Send, cloud: Cloud,
+  "layout-grid": LayoutGrid, "trending-down": TrendingDown, download: Download, moon: Moon,
+  search: Search, anchor: Anchor, paw: PawPrint,
 }
 
 export function Icon({ name, className }: { name?: unknown; className?: string }) {

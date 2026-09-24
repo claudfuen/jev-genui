@@ -1,0 +1,21 @@
+evals/diagnosis-2026-09-24.md
+  s_f70fe91dfb9759::t_84028bcdc9f0f2 1-80
+scripts/compose-llm.ts
+  s_f70fe91dfb9759::t_2955610afec467 1-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "707fe196dad96f838085f0a80e53d5089c247b36",
+  "prompts": {},
+  "sessions": {
+    "s_f70fe91dfb9759": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72a6def1-9a16-4f27-8058-abc080d286b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Claudio Fuentes <imclaudfuen@gmail.com>"
+    }
+  }
+}

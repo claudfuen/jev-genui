@@ -26,6 +26,10 @@ export const SUITE: { q: string; tag: "real" | "edge" }[] = [
     "online course lesson page", "real estate listing", "crypto portfolio tracker", "hotel booking search results",
     "fitness tracker daily summary", "email inbox", "crm for a law firm", "todo app", "admin panel for a hospital",
     "tinder for dogs", "uber for lawn mowing",
+    // Added with the media primitives (gallery, detail, map, feed, video, heatmap, code).
+    "todo list with photos", "product page for a leather bag", "photographer portfolio",
+    "apartments for rent near me with a map", "social app for dog owners", "api docs for developers",
+    "habit tracker", "recipe app with photos",
   ].map((q) => ({ q, tag: "real" as const })),
   ...[
     "asdfghjkl", "🍕🍕🍕", "ダッシュボード 売上", "panel de control para una panadería", "hi", "just a button",

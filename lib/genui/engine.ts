@@ -354,6 +354,26 @@ function repair(pending: Pending[], answers: Map<string, Answer>) {
   }
 }
 
+/** Page-level cleanups once the whole tree is known. */
+function tidy(root: UINode) {
+  const all = walk(root)
+  for (const n of all) {
+    // A photo subject means nothing on a list without photos.
+    if (n.kind === "list" && n.props.media === "none" && "subject" in n.props) {
+      delete n.props.subject
+      n.decisions = n.decisions.filter((d) => d.prop !== "subject")
+    }
+  }
+  // Time slots already pick the date and time; a form beside them should not ask again.
+  if (all.some((n) => n.kind === "timeslots")) {
+    for (const n of all) {
+      if (n.kind === "form" && Array.isArray(n.props.controls)) {
+        n.props.controls = n.props.controls.filter((c) => !["Date", "Time", "Start date"].includes(c))
+      }
+    }
+  }
+}
+
 function walk(n: UINode, out: UINode[] = []): UINode[] {
   out.push(n)
   n.children.forEach((c) => walk(c, out))
@@ -446,7 +466,9 @@ function resolveSlots(
   let kept = picks.filter((p) => p.kind !== NONE)
   // A hero only makes sense at the top of a page, a closing CTA at the bottom.
   if (parent.kind === "page") {
-    const rank = (k: string) => (k === "hero" ? -1 : k === "cta" ? 1 : 0)
+    // Banners and heroes belong at the top, search above its results, a closing CTA and the footer at the bottom.
+    const rank = (k: string) =>
+      ({ banner: -3, hero: -2, search: -1, cta: 1, footer: 2 })[k] ?? 0
     kept = kept
       .map((p, i) => ({ p, i }))
       .sort((x, y) => rank(x.p.kind) - rank(y.p.kind) || x.i - y.i)
@@ -653,5 +675,6 @@ export async function compose(
     opts.onRound?.(structuredClone(root), stat)
   }
 
+  tidy(root)
   return { tree: root, rounds }
 }

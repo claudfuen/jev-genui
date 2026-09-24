@@ -263,6 +263,7 @@ export const LIST_KINDS: Record<string, [items: string, description: string]> = 
   Holdings: ["holdings", "assets owned, like stocks or crypto, with value and change"],
   Integrations: ["apps", "connected apps and integrations"],
   Services: ["services", "systems with a health status"],
+  Leaderboard: ["leaderboard", "people ranked by score"],
   Tracks: ["tracks", "songs with durations"],
   Episodes: ["tracks", "podcast episodes with durations"],
 }
@@ -371,6 +372,7 @@ export const PROFILE_PERSONAS: Record<string, string> = {
   creator: "a content creator or influencer",
   developer: "a software developer",
   designer: "a designer or artist",
+  photographer: "a photographer",
   athlete: "an athlete or coach",
   musician: "a musician or DJ",
   doctor: "a doctor or therapist",
@@ -507,6 +509,68 @@ export const KEYPADS: Record<string, string> = {
 }
 
 export const FORECASTS: Record<string, string> = { daily: "the next five days", hourly: "the next several hours" }
+
+export const LIST_MEDIA: Record<string, string> = {
+  none: "text only",
+  thumbnails: "a small photo beside each item",
+  covers: "each item as a card with a big photo on top",
+}
+
+export const BOARD_COVERS: Record<string, string> = { plain: "text-only cards", covers: "cards with a cover photo" }
+
+export const DETAIL_KINDS: Record<string, string> = {
+  product: "a product for sale, with colors, sizes and add to cart",
+  home: "a home or apartment listing",
+  hotel: "a hotel or rental stay",
+  car: "a car for sale",
+  course: "an online course",
+  event: "an event with tickets",
+  dish: "a dish on a menu",
+}
+
+export const VIDEO_KINDS: Record<string, string> = {
+  lesson: "a course lesson", "product demo": "a product walkthrough", trailer: "a film or show trailer",
+  livestream: "a live stream", recipe: "a cooking video", workout: "a workout video",
+}
+
+export const MAP_PLACES: Record<string, string> = {
+  "one location": "a single address, like a store or office", homes: "homes for sale or rent", restaurants: "restaurants nearby",
+  hotels: "hotels and stays", pros: "service providers nearby", events: "events around town", deliveries: "a delivery on its way",
+}
+
+export const LOGO_LABELS = ["Trusted by teams at", "As seen in", "Our partners", "Works with the tools you use", "Loved by customers at"]
+
+export const FEED_KINDS: Record<string, string> = {
+  social: "friends sharing photos and updates", community: "members posting in a community",
+  news: "company or product announcements", creators: "creators posting photos",
+}
+
+export const COMMENT_KINDS: Record<string, string> = {
+  reviews: "customer reviews with star ratings", discussion: "a comment thread", questions: "questions and answers",
+}
+
+export const BOOKINGS: Record<string, string> = {
+  "table reservation": "a restaurant table", appointment: "an appointment with a professional", class: "a class or lesson",
+  call: "a video call or demo", tour: "a home or venue tour", "court booking": "a sports court or room",
+}
+
+export const BANNERS = [
+  "Free shipping on orders over $50", "New: dark mode is here", "Summer sale: 20% off everything", "We are hiring, join the team",
+  "Classes resume Monday", "Limited spots left for October", "Now open on weekends", "Version 2.0 is live",
+]
+
+export const CODE_SNIPPETS: Record<string, string> = {
+  "install command": "installing a package", "API request": "calling an HTTP API", "config file": "a configuration file",
+  "component usage": "using a UI component",
+}
+
+export const SWATCH_KINDS: Record<string, string> = { colors: "color choices", sizes: "size choices", "colors and sizes": "both colors and sizes" }
+export const UPLOAD_KINDS: Record<string, string> = { photos: "images", documents: "PDFs and documents", "any file": "any file", spreadsheet: "CSV or spreadsheet" }
+export const CHECKLIST = [
+  "Free delivery", "Free returns", "2-year warranty", "Setup included", "Materials included", "Lifetime access",
+  "Certificate of completion", "Cancel anytime", "24/7 support", "Secure payment", "Handmade", "Sustainably sourced",
+  "Breakfast included", "Free cancellation", "Parking available", "Pet friendly",
+]
 
 // --- Atoms --------------------------------------------------------------------
 

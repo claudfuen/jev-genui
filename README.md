@@ -25,6 +25,14 @@ a table picks its columns after it has a title.
 
 A typical page takes 2 to 3 rounds, under a second.
 
+## What it can compose
+
+About 70 component kinds: dashboards (KPI tiles, charts, tables, heatmaps), apps (kanban, chat,
+feeds, to-do lists, settings, booking time slots, maps), commerce (product pages with gallery,
+swatches and cart, listings, pricing, order summaries), media (galleries, carousels, video, music
+player), marketing (hero, features, logos, testimonials, CTA, footer), plus atoms like progress
+rings, file upload, pagination and one-time-code inputs. Every photo slot is a seeded placeholder.
+
 ## Play with it
 
 - **Swap:** every decision in the panel lists Jev's runners-up. Click one to swap it in.

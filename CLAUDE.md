@@ -56,6 +56,13 @@ passes averaged), v10 won 74 of 82 head-to-head judgments.
 
 ## Rules
 
+- Never name a component prop `kind`: every node already records a `kind` decision (which
+  component it is), and swaps keyed `path|kind` replace the whole component.
+- Keep `KIND_INFO` short but keep the use-case hint ("; dashboards, analytics"). Stripping hints to
+  save request size cost about 10 points of pass rate when the menu grew to 45 sections.
+- Every image goes through `Placeholder` in the interpreter (seeded gradient mesh, subject icon,
+  optional caption) so photo slots look intentional and never flicker.
+
 - shadcn preset `b1PzeK` (Base UI, not Radix): no `asChild`; compose with the `render` prop,
   and pass `nativeButton={false}` when a Button renders a non-button element.
 - Next.js 16: read `node_modules/next/dist/docs/` before using an API you have not checked.

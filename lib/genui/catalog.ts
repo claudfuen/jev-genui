@@ -9,64 +9,85 @@ import type { Kind, UINode } from "./types"
 export const MAX_DEPTH = 3 // page = 0, sections = 1, containers inside sections = 2, leaves = 3
 export const NONE = "none"
 
+// Kept short on purpose: every slot question carries all of these, and Jev's
+// limit is request size, so long descriptions cost reliability.
 export const KIND_INFO: Record<Kind | typeof NONE, string> = {
   page: "the whole page",
-  grid: "grid: 2-4 equal tiles side by side (feature cards, media cards, people, mixed tiles)",
-  split: "split: two columns side by side, e.g. main content next to a side panel",
-  tabs: "tabs: 2-3 switchable views of related content",
-  card: "card: a titled panel grouping a few small elements",
-  row: "row: a few small elements side by side, like a button group or a price next to a rating",
-  hero: "hero banner: big headline, subtitle and call-to-action buttons (landing and marketing pages)",
-  stats: "KPI row: 3-4 key metrics with trends (dashboards, analytics, monitoring)",
-  form: "form: titled form with fields and a submit button (sign up, checkout, booking, contact)",
-  chart: "chart: bar, line, area or pie chart of one metric over time or categories",
-  table: "table: rows of records with columns",
-  list: "list: a vertical list of items (people, tasks, notifications, files, messages, apps, services, tracks)",
-  board: "kanban board: columns of cards moving through stages (tasks, hiring, deals, tickets)",
-  chat: "chat: a message thread with a composer (support, messaging, AI assistant)",
-  player: "media player: artwork, now playing, progress and playback controls",
-  pricing: "pricing tiers: 2-3 plans side by side with prices, features and a button",
-  profile: "profile header: avatar, name, role, stats and an action button",
-  details: "details: label and value rows, like an order summary, property facts or account info",
-  listings: "listings: a grid of media cards with image, title, price and rating (shop, rentals, courses)",
-  search: "search bar with filter controls, placed above results",
-  settings: "settings: rows of on/off preferences, each with a description",
-  features: "feature grid: 3-6 benefits, each with an icon, title and one line",
-  steps: "steps: a progress indicator through stages (checkout, onboarding, order tracking)",
-  testimonial: "testimonial: a customer quote with the person's name",
-  cta: "call to action: a closing banner with a headline and a button",
-  timeline: "timeline: events in order (order tracking, activity, changelog, itinerary)",
-  accordion: "FAQ accordion: collapsible frequently asked questions",
-  alert: "alert: short callout banner (info, warning, success, error)",
-  calendar: "calendar: month view for picking a date",
-  empty: "empty state or error page: a friendly message when there is nothing to show (no results, 404 page not found)",
-  swipe: "swipe deck: one big card at a time with pass and like buttons (dating-style matching)",
-  keypad: "keypad: a calculator, dialer or PIN pad with a display and number keys",
-  forecast: "weather forecast: current conditions with a strip of upcoming days or hours",
-  media: "media card: image, title, price and rating for one item",
-  feature: "feature tile: icon, title and one line about a benefit",
-  person: "person card: avatar, name, role and a button",
-  heading: "heading: a title line",
-  stat: "stat: one KPI tile with a big number and a trend",
-  text: "text: a short paragraph of copy",
-  progress: "progress bar toward a goal",
-  field: "form field: one labeled input",
-  toggle: "toggle: one on/off switch or checkbox with a label",
-  slider: "slider: a range input with a label",
-  radio: "radio group: pick one of a few options",
-  button: "button: a single action button",
-  badges: "badges: a row of tags or status chips",
-  avatars: "avatars: stacked profile pictures of people",
-  image: "image: a picture or media placeholder",
-  separator: "separator: a thin divider line",
-  price: "price: a large price with its billing period",
-  rating: "rating: stars with a review count",
-  status: "status: a colored dot with a state like Online or Operational",
-  segmented: "segmented control: 2-3 options in a pill, like Day / Week / Month",
-  searchbox: "search box: one search input",
-  otp: "verification code input: six boxes for a one-time code",
-  quantity: "quantity stepper: minus, number, plus",
-  none: "nothing: leave this position empty",
+  grid: "2-4 equal tiles side by side",
+  split: "two columns: main content and a side panel",
+  tabs: "2-3 switchable views",
+  card: "a titled panel with a few small elements",
+  row: "small elements side by side",
+  hero: "big headline and buttons; landing and marketing pages",
+  stats: "3-4 KPI tiles with trends; dashboards, analytics, monitoring",
+  form: "fields and a submit button; sign up, checkout, booking, contact",
+  chart: "chart of a metric; dashboards and analytics",
+  table: "rows of records; admin panels, CRMs, orders",
+  list: "list of items (tasks, people, files, messages), optionally with photos; to-do apps",
+  board: "kanban columns of cards; tasks, hiring, deals, tickets",
+  chat: "message thread and composer; support, messaging, AI assistants",
+  player: "music or podcast player",
+  pricing: "2-3 plans with prices; pricing pages",
+  profile: "profile header; user profiles, portfolios",
+  details: "label and value rows; order summaries, account info",
+  listings: "grid of photo cards with prices; shops, rentals, courses, search results",
+  search: "search bar with filters",
+  settings: "on/off preferences; settings pages",
+  features: "3-6 benefits with icons; landing pages",
+  steps: "progress through stages",
+  testimonial: "a customer quote",
+  cta: "closing banner with a headline and button",
+  timeline: "events in order",
+  accordion: "collapsible FAQ",
+  alert: "short callout message",
+  calendar: "month calendar",
+  empty: "empty state or 404; only when there is nothing to show",
+  swipe: "one big photo card with pass and like buttons",
+  keypad: "calculator, dialer or PIN pad",
+  forecast: "weather now and the coming days",
+  detail: "one product or listing page: photos, price, options, buy button",
+  gallery: "grid of photos; portfolios, venues, albums",
+  carousel: "horizontally scrolling photo cards",
+  video: "video player with a poster frame",
+  map: "map with pins",
+  logos: "row of customer or partner logos",
+  feed: "social posts with photos and likes; social and community apps",
+  comments: "reviews or a comment thread",
+  timeslots: "pick a date and time to book; reservations, appointments",
+  footer: "page footer with link columns",
+  banner: "thin announcement bar at the very top",
+  heatmap: "activity grid of days; habit and streak trackers",
+  code: "code snippet; developer docs and APIs",
+  media: "photo card for one item",
+  feature: "icon, title and one line",
+  person: "avatar, name, role and button",
+  heading: "a title line",
+  stat: "one KPI with a trend",
+  text: "a short paragraph",
+  progress: "progress bar",
+  field: "one labeled input",
+  toggle: "one switch or checkbox",
+  slider: "range slider",
+  radio: "pick one of a few options",
+  button: "one button",
+  badges: "a few tags",
+  avatars: "stacked profile pictures",
+  image: "a photo",
+  separator: "divider line",
+  price: "a large price",
+  rating: "stars and review count",
+  status: "colored status dot",
+  segmented: "2-3 option pill switch",
+  searchbox: "one search input",
+  otp: "one-time code boxes",
+  quantity: "minus, number, plus",
+  ring: "circular progress toward a goal",
+  swatches: "color or size choices",
+  upload: "file drop zone",
+  pagination: "page numbers",
+  breadcrumb: "breadcrumb trail",
+  checklist: "list of included items with checkmarks",
+  none: "nothing here",
 }
 
 type Grammar = {
@@ -83,15 +104,17 @@ type Grammar = {
 
 const ORDINAL = ["first", "second", "third", "fourth"]
 const SECTIONS: Kind[] = [
-  "hero", "stats", "search", "listings", "grid", "split", "tabs", "card", "form", "chart", "table",
-  "list", "board", "chat", "player", "pricing", "profile", "details", "features", "steps",
-  "testimonial", "cta", "timeline", "accordion", "alert", "settings", "empty", "swipe", "keypad", "forecast",
+  "banner", "hero", "detail", "stats", "search", "listings", "gallery", "carousel", "grid", "split", "tabs", "card",
+  "form", "chart", "table", "list", "board", "chat", "feed", "comments", "player", "video", "map", "pricing",
+  "profile", "details", "features", "logos", "steps", "testimonial", "cta", "timeline", "accordion", "alert",
+  "settings", "timeslots", "heatmap", "code", "empty", "swipe", "keypad", "forecast", "footer",
   // Atoms are allowed on their own for requests like "just a button".
-  "button", "searchbox", "otp", "calendar",
+  "button", "searchbox", "otp", "calendar", "upload",
 ]
 const ATOMS: Kind[] = [
-  "text", "stat", "progress", "field", "toggle", "button", "badges", "avatars", "image", "separator",
-  "price", "rating", "status", "segmented", "searchbox", "otp", "quantity",
+  "text", "stat", "progress", "ring", "field", "toggle", "button", "badges", "avatars", "image", "separator",
+  "price", "rating", "status", "segmented", "searchbox", "otp", "quantity", "swatches", "upload", "checklist",
+  "pagination",
 ]
 
 export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
@@ -100,7 +123,7 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
     allowed: SECTIONS,
     min: 1,
     repeatable: ["card"],
-    families: [["list", "table", "listings"], ["board", "list"], ["chat", "list"], ["player", "list"]],
+    families: [["list", "table", "listings"], ["board", "list"], ["chat", "list"], ["player", "list"], ["gallery", "carousel", "listings"], ["detail", "listings"], ["detail", "form"]],
     noneAllowed: true,
     describe: (i) =>
       `Section ${i + 1} of up to 5, stacked top to bottom on the page. ${
@@ -111,15 +134,15 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
   },
   grid: {
     slots: 4,
-    allowed: ["card", "media", "feature", "person", "stat", "chart", "image", "progress"],
+    allowed: ["card", "media", "feature", "person", "stat", "chart", "image", "progress", "ring", "video"],
     min: 2,
-    repeatable: ["card", "media", "feature", "person", "stat", "chart", "image", "progress"],
+    repeatable: ["card", "media", "feature", "person", "stat", "chart", "image", "progress", "ring", "video"],
     noneAllowed: true,
     describe: (i) => `Tile ${i + 1} of up to 4 in a row of equal tiles. Tiles in one row are usually the same kind.`,
   },
   split: {
     slots: 2,
-    allowed: ["card", "form", "chart", "table", "list", "details", "chat", "player", "calendar", "profile", "settings", "timeline", "steps", "stats", "image", "text", "accordion"],
+    allowed: ["card", "form", "chart", "table", "list", "details", "chat", "player", "video", "map", "gallery", "feed", "comments", "timeslots", "calendar", "profile", "settings", "timeline", "steps", "stats", "heatmap", "code", "image", "text", "accordion"],
     min: 2,
     repeatable: ["card"],
     families: [["chat", "list"]],
@@ -128,7 +151,7 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
   },
   tabs: {
     slots: 3,
-    allowed: ["chart", "table", "list", "form", "card", "board", "listings", "settings", "details", "timeline"],
+    allowed: ["chart", "table", "list", "form", "card", "board", "listings", "gallery", "feed", "comments", "map", "code", "settings", "details", "timeline"],
     min: 2,
     repeatable: ["chart", "table", "list", "card"],
     noneAllowed: true,
@@ -144,7 +167,7 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
   },
   row: {
     slots: 3,
-    allowed: ["button", "badges", "avatars", "price", "rating", "status", "segmented", "searchbox", "quantity", "text"],
+    allowed: ["button", "badges", "avatars", "price", "rating", "status", "segmented", "searchbox", "quantity", "swatches", "pagination", "text"],
     min: 2,
     repeatable: ["button"],
     noneAllowed: true,
@@ -269,10 +292,18 @@ export function detailQuestions(node: UINode, ctx: Ctx): DetailQuestion[] {
       qs.push(title("table title"))
       break
     case "list":
-      qs.push(choice("title", "What this list shows.", Object.fromEntries(keys(B.LIST_KINDS).map((k) => [k, B.LIST_KINDS[k][1]])), page("title")))
+      qs.push(
+        choice("title", "What this list shows.", Object.fromEntries(keys(B.LIST_KINDS).map((k) => [k, B.LIST_KINDS[k][1]])), page("title")),
+        choice("media", "Whether items show photos. Use photos whenever the request mentions photos or pictures.", B.LIST_MEDIA),
+        choice("subject", "What the photos show, if any.", opts(B.ICONS)),
+      )
       break
     case "board":
-      qs.push(title("board title"), choice("pipeline", "Which stages the cards move through.", Object.fromEntries(keys(B.PIPELINES).map((k) => [k, B.PIPELINES[k].join(", ")]))))
+      qs.push(
+        title("board title"),
+        choice("pipeline", "Which stages the cards move through.", Object.fromEntries(keys(B.PIPELINES).map((k) => [k, B.PIPELINES[k].join(", ")]))),
+        choice("covers", "Whether cards show a cover photo. Use photos whenever the request mentions photos or pictures.", B.BOARD_COVERS),
+      )
       break
     case "chat":
       qs.push(title("conversation title"), choice("persona", "Who is talking in this conversation.", B.CHAT_PERSONAS))
@@ -357,6 +388,62 @@ export function detailQuestions(node: UINode, ctx: Ctx): DetailQuestion[] {
       break
     case "forecast":
       qs.push(choice("range", "What the forecast covers.", B.FORECASTS))
+      break
+    case "detail":
+      qs.push(
+        choice("item", "What this page is about.", B.DETAIL_KINDS),
+        choice("name", "The item's name.", opts(ctx.spans.length ? ctx.spans : ["Signature collection"])),
+        choice("cta", "The main button.", opts(["Add to cart", "Buy now", "Book now", "Reserve", "Enroll now", "Get tickets", "Schedule a tour", "Order now", "Contact seller"])),
+      )
+      break
+    case "gallery":
+      qs.push(
+        choice("subject", "What the photos show.", opts(B.ICONS)),
+        choice("count", "How many photos.", { "4": "four large photos", "6": "six photos", "9": "nine small photos" }),
+        choice("title", "The gallery title.", withNone(["Gallery", "Portfolio", "Photos", "Recent work", "Moments", "Our space", "Inspiration"])),
+      )
+      break
+    case "carousel":
+      qs.push(choice("items", "What the cards show.", B.LISTING_TYPES))
+      break
+    case "video":
+      qs.push(choice("video", "What the video is.", B.VIDEO_KINDS))
+      break
+    case "map":
+      qs.push(choice("places", "What the map shows.", B.MAP_PLACES))
+      break
+    case "logos":
+      qs.push(choice("label", "The line above the logos.", opts(B.LOGO_LABELS)))
+      break
+    case "feed":
+      qs.push(choice("source", "Whose posts these are.", B.FEED_KINDS))
+      break
+    case "comments":
+      qs.push(choice("style", "What kind of comments.", B.COMMENT_KINDS))
+      break
+    case "timeslots":
+      qs.push(choice("booking", "What is being booked.", B.BOOKINGS))
+      break
+    case "banner":
+      qs.push(choice("message", "The announcement.", opts(B.BANNERS)))
+      break
+    case "heatmap":
+      qs.push(choice("metric", "What the grid tracks.", opts(["Workouts", "Commits", "Meditation", "Reading", "Posts", "Practice", "Sales", "Check-ins"])))
+      break
+    case "code":
+      qs.push(choice("snippet", "What the snippet shows.", B.CODE_SNIPPETS))
+      break
+    case "ring":
+      qs.push(choice("label", "What the ring tracks.", opts(keys(B.METRICS)), page("metric")))
+      break
+    case "swatches":
+      qs.push(choice("choices", "What to choose between.", B.SWATCH_KINDS))
+      break
+    case "upload":
+      qs.push(choice("accept", "What can be uploaded.", B.UPLOAD_KINDS))
+      break
+    case "checklist":
+      qs.push({ type: "set", prop: "items", items: B.CHECKLIST, min: 3, max: 5, order: "rank", ask: (item) => `Is "${item}" something this includes?` })
       break
     case "media":
       qs.push(choice("items", "What this card shows.", B.LISTING_TYPES, ctx.parent ? `${ctx.parent.id}:media` : undefined))

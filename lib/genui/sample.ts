@@ -227,13 +227,14 @@ export function cell(r: Rand, col: string, row: number): Cell {
 export type ListItem = { title: string; meta: string; avatar?: string; trailing?: string; positive?: boolean; done?: boolean }
 
 export function listItems(r: Rand, kind: string, n = 4): ListItem[] {
+  const taskOffset = Math.floor(r() * TASKS.length)
   return Array.from({ length: n }, (_, i) => {
     const person = PEOPLE[(i * 3 + Math.floor(r() * 4)) % PEOPLE.length]
     switch (kind) {
       case "people":
         return { title: person, meta: pick(r, ROLES), avatar: initials(person) }
       case "tasks":
-        return { title: TASKS[(i + Math.floor(r() * 3)) % TASKS.length], meta: `Due ${pick(r, ["today", "tomorrow", "Friday", "next week"])}`, done: i === 0 }
+        return { title: TASKS[(i + taskOffset) % TASKS.length], meta: `Due ${pick(r, ["today", "tomorrow", "Friday", "next week"])}`, done: i === 0 }
       case "notifications":
         return { title: NOTIFS[(i * 2 + Math.floor(r() * 2)) % NOTIFS.length], meta: `${i * 7 + 2} min ago` }
       case "files":
@@ -404,6 +405,7 @@ export const PROFILES: Record<string, { name: string; role: string; location: st
   creator: { name: "Mia Chen", role: "Food and travel creator", location: "Lisbon", stats: [["Followers", "284K"], ["Posts", "1,204"], ["Following", "312"]] },
   developer: { name: "Arjun Mehta", role: "Staff engineer and open source maintainer", location: "Toronto", stats: [["Repos", "86"], ["Stars", "12.4K"], ["Followers", "3.1K"]] },
   designer: { name: "Chloe Dubois", role: "Product designer and illustrator", location: "Berlin", stats: [["Shots", "214"], ["Likes", "48K"], ["Followers", "9.8K"]] },
+  photographer: { name: "Noah Garcia", role: "Wedding and portrait photographer", location: "Miami", stats: [["Shoots", "320"], ["Clients", "180"], ["Rating", "4.9"]] },
   athlete: { name: "Mateo Rossi", role: "Marathon runner and coach", location: "Miami", stats: [["Races", "38"], ["Best", "2:41"], ["Athletes", "120"]] },
   musician: { name: "Ava Patel", role: "DJ and producer", location: "London", stats: [["Listeners", "1.2M"], ["Tracks", "64"], ["Shows", "210"]] },
   doctor: { name: "Dr. William Kim", role: "Family physician", location: "Chicago", stats: [["Patients", "2,400"], ["Rating", "4.9"], ["Years", "15"]] },
@@ -493,3 +495,63 @@ export const SWIPE_CARDS: Record<string, { title: string; meta: string; tags: st
 }
 
 export const PRICE_RANGES: Record<string, [number, number]> = { budget: [4, 19], mid: [24, 180], premium: [240, 1800], luxury: [2400, 12000] }
+
+// ---------------------------------------------------------------------------
+// Media-rich primitives
+
+export const DETAIL_ITEMS: Record<string, { category: string; facts: [string, string][]; blurb: string; icon: string; price: (r: Rand) => string }> = {
+  product: { category: "New arrival", facts: [], blurb: "Made to last, designed to be used every day. Free returns within 30 days.", icon: "package", price: (r) => `$${Math.round(between(r, 49, 390))}` },
+  home: { category: "For sale", facts: [["Beds", "3"], ["Baths", "2"], ["Sq ft", "1,850"], ["Built", "2016"]], blurb: "Bright corner home with an open kitchen, a private yard and parking for two.", icon: "home", price: (r) => `$${(Math.round(between(r, 380, 1400)) * 1000).toLocaleString("en-US")}` },
+  hotel: { category: "Entire suite", facts: [["Guests", "2"], ["Bedroom", "1"], ["Bath", "1"], ["Wifi", "Fast"]], blurb: "A calm suite steps from the old town, with breakfast and late checkout.", icon: "bed", price: (r) => `$${Math.round(between(r, 120, 420))} / night` },
+  car: { category: "Certified pre-owned", facts: [["Miles", "18k"], ["Fuel", "Electric"], ["Range", "358 mi"], ["Seats", "5"]], blurb: "One owner, full service history and a 12-month warranty included.", icon: "car", price: (r) => `$${(Math.round(between(r, 22, 58)) * 1000).toLocaleString("en-US")}` },
+  course: { category: "Online course", facts: [["Lessons", "24"], ["Length", "6 h"], ["Level", "Beginner"], ["Certificate", "Yes"]], blurb: "Learn at your own pace with short lessons, real projects and feedback.", icon: "graduation-cap", price: (r) => `$${Math.round(between(r, 29, 199))}` },
+  event: { category: "Live event", facts: [["Date", "Oct 4"], ["Time", "8:00 PM"], ["Venue", "The Hall"], ["Ages", "18+"]], blurb: "An evening of live music, local food and good company. Doors open at 7.", icon: "ticket", price: (r) => `$${Math.round(between(r, 18, 95))}` },
+  dish: { category: "Chef's special", facts: [["Serves", "1"], ["Calories", "640"], ["Spice", "Mild"], ["Prep", "15 min"]], blurb: "Fresh, seasonal and made to order. Ask us about allergens.", icon: "utensils", price: (r) => `$${Math.round(between(r, 12, 34))}` },
+}
+
+export const VIDEO_TITLES: Record<string, [string, string]> = {
+  lesson: ["Lesson 4: Your first project", "12:30"], "product demo": ["See it in action in 3 minutes", "3:04"],
+  trailer: ["Official trailer", "2:18"], livestream: ["Live now: weekly Q&A", "LIVE"],
+  recipe: ["The perfect weeknight pasta", "8:45"], workout: ["20-minute full body session", "20:00"],
+}
+
+export type Post = { name: string; handle: string; time: string; text: string; photo: boolean; likes: number; comments: number }
+const POST_TEXT: Record<string, string[]> = {
+  social: ["Best weekend in a long time. Already planning the next one.", "Tried the new place downtown. 10/10 would go again.", "Morning views like this make it easy to get up."],
+  community: ["Just finished my first project with the group. Thanks for all the tips!", "Anyone going to the meetup on Friday?", "Sharing a few photos from last night's session."],
+  news: ["We just shipped dark mode. Try it in settings.", "Our new office is open. Come say hi!", "Thank you for 10,000 customers."],
+  creators: ["New series drops tomorrow. Here is a sneak peek.", "Behind the scenes from today's shoot.", "Which one should I post next?"],
+}
+export function posts(r: Rand, kind: string): Post[] {
+  const texts = POST_TEXT[kind] ?? POST_TEXT.social
+  return texts.map((text, i) => {
+    const name = PEOPLE[(i * 4 + Math.floor(r() * 3)) % PEOPLE.length]
+    return { name, handle: `@${name.split(" ")[0].toLowerCase()}`, time: ["2m", "1h", "3h"][i], text, photo: i !== 1, likes: Math.round(between(r, 12, 2400)), comments: Math.round(between(r, 1, 180)) }
+  })
+}
+
+export type Comment = { name: string; time: string; text: string; stars?: number }
+const COMMENT_TEXT: Record<string, string[]> = {
+  reviews: ["Exactly as described and arrived fast. Would buy again.", "Great quality for the price. The color is even nicer in person.", "Good overall, but it runs a little small."],
+  discussion: ["This is really helpful, thanks for sharing.", "Has anyone tried this with a bigger team?", "We did something similar last year and it worked well."],
+  questions: ["Does this come in other colors?", "Yes! It comes in three colors, all in stock.", "How long does shipping take to Canada?"],
+}
+export function comments(r: Rand, kind: string): Comment[] {
+  const texts = COMMENT_TEXT[kind] ?? COMMENT_TEXT.discussion
+  return texts.map((text, i) => ({
+    name: PEOPLE[(i * 5 + Math.floor(r() * 3)) % PEOPLE.length],
+    time: ["2 days ago", "1 week ago", "3 weeks ago"][i],
+    text,
+    stars: kind === "reviews" ? [5, 5, 4][i] : undefined,
+  }))
+}
+
+export const CODE_SAMPLES: Record<string, [lang: string, code: string]> = {
+  "install command": ["bash", "npm install @acme/sdk\n\nnpx acme init --template starter"],
+  "API request": ["bash", "curl https://api.acme.dev/v1/orders \\\n  -H \"Authorization: Bearer $API_KEY\" \\\n  -d amount=2500 \\\n  -d currency=usd"],
+  "config file": ["json", "{\n  \"name\": \"my-app\",\n  \"region\": \"us-east-1\",\n  \"features\": [\"auth\", \"billing\"],\n  \"retries\": 3\n}"],
+  "component usage": ["tsx", "import { Button } from \"@acme/ui\"\n\nexport function Save() {\n  return <Button variant=\"primary\">Save changes</Button>\n}"],
+}
+
+export const LEADERBOARD = (r: Rand) =>
+  PEOPLE.slice(0, 5).map((name, i) => ({ title: name, meta: `${Math.round(between(r, 12, 40))} day streak`, trailing: `${(2400 - i * 310 - Math.round(r() * 80)).toLocaleString("en-US")} pts`, rank: i + 1 }))

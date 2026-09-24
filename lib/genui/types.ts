@@ -34,6 +34,19 @@ export type Kind =
   | "swipe"
   | "keypad"
   | "forecast"
+  | "detail"
+  | "gallery"
+  | "carousel"
+  | "video"
+  | "map"
+  | "logos"
+  | "feed"
+  | "comments"
+  | "timeslots"
+  | "footer"
+  | "banner"
+  | "heatmap"
+  | "code"
   // tiles
   | "media"
   | "feature"
@@ -59,6 +72,12 @@ export type Kind =
   | "searchbox"
   | "otp"
   | "quantity"
+  | "ring"
+  | "swatches"
+  | "upload"
+  | "pagination"
+  | "breadcrumb"
+  | "checklist"
 
 export type PropValue = string | number | boolean | string[]
 

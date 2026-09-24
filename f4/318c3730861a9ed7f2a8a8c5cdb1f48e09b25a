@@ -1,0 +1,19 @@
+lib/genui/engine.ts
+  s_f70fe91dfb9759::t_1484fdf7d54149 470
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f4318c3730861a9ed7f2a8a8c5cdb1f48e09b25a",
+  "prompts": {},
+  "sessions": {
+    "s_f70fe91dfb9759": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72a6def1-9a16-4f27-8058-abc080d286b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Claudio Fuentes <imclaudfuen@gmail.com>"
+    }
+  }
+}

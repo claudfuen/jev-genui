@@ -58,6 +58,35 @@ export const KIND_INFO: Record<Kind | typeof NONE, string> = {
   banner: "thin announcement bar at the very top",
   heatmap: "activity grid of days; habit and streak trackers",
   code: "code snippet; developer docs and APIs",
+  tracker: "status card for an order, delivery or application with progress steps; order tracking",
+  countdown: "live countdown to a date; launches, sales, maintenance pages",
+  timer: "stopwatch, timer or pomodoro with controls; time tracking",
+  filters: "filter controls (price, rating, brand...) for results; shop and search pages",
+  matrix: "grid of rows by columns: permissions toggles or a comparison table",
+  itinerary: "flight or train results with times, stops and prices; travel booking",
+  ticket: "boarding pass, event ticket or coupon with a QR code",
+  invite: "invite people by email with roles; team and sharing screens",
+  breakdown: "amounts per category with bars or a donut; budgets, spending, portfolios",
+  wallet: "payment cards or bank accounts; banking and billing",
+  stories: "horizontal row of avatars; stories or frequent contacts",
+  people: "grid of people with photos and titles; speakers, team, instructors",
+  cart: "shopping cart items with quantities and subtotal",
+  editor: "rich text editor with toolbar; notes, docs, composing email",
+  article: "long-form text with headings; blog posts, legal terms, help and docs",
+  week: "week calendar grid with event blocks; calendars and schedules",
+  choices: "selectable options with prices: ticket types, donation amounts",
+  quiz: "quiz question, flashcard or score results; learning apps",
+  call: "video call participant grid with controls; meetings, telehealth",
+  reader: "an open email or support ticket with reply box",
+  amenities: "icons with labels for what a place includes; rentals, hotels",
+  thread: "discussion post with votes and nested replies; forums, communities",
+  scanner: "camera viewfinder to scan a barcode, QR code or document",
+  gauge: "value on a banded scale, like BMI, heart rate zone or credit score",
+  days: "seven-day strip with a status per day; habits, workouts, plans",
+  logs: "monospace log lines with levels; logs and developer consoles",
+  pipeline: "build or deploy runs with stage progress; CI/CD",
+  converter: "two linked fields that convert units or currencies",
+  clocks: "current time in several cities; world clock",
   media: "photo card for one item",
   feature: "icon, title and one line",
   person: "avatar, name, role and button",
@@ -108,6 +137,9 @@ const SECTIONS: Kind[] = [
   "form", "chart", "table", "list", "board", "chat", "feed", "comments", "player", "video", "map", "pricing",
   "profile", "details", "features", "logos", "steps", "testimonial", "cta", "timeline", "accordion", "alert",
   "settings", "timeslots", "heatmap", "code", "empty", "swipe", "keypad", "forecast", "footer",
+  "tracker", "countdown", "timer", "filters", "matrix", "itinerary", "ticket", "invite", "breakdown", "wallet",
+  "stories", "people", "cart", "editor", "article", "week", "choices", "quiz", "call", "reader", "amenities",
+  "thread", "scanner", "gauge", "days", "logs", "pipeline", "converter", "clocks",
   // Atoms are allowed on their own for requests like "just a button".
   "button", "searchbox", "otp", "calendar", "upload",
 ]
@@ -142,7 +174,9 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
   },
   split: {
     slots: 2,
-    allowed: ["card", "form", "chart", "table", "list", "details", "chat", "player", "video", "map", "gallery", "feed", "comments", "timeslots", "calendar", "profile", "settings", "timeline", "steps", "stats", "heatmap", "code", "image", "text", "accordion"],
+    allowed: ["card", "form", "chart", "table", "list", "details", "chat", "player", "video", "map", "gallery", "feed", "comments", "timeslots", "calendar", "profile", "settings", "timeline", "steps", "stats", "heatmap", "code", "image", "text", "accordion",
+      "filters", "reader", "editor", "breakdown", "cart", "wallet", "tracker", "quiz", "gauge", "clocks", "converter", "logs",
+      "pipeline", "thread", "people", "amenities", "invite", "choices", "ticket", "itinerary", "days", "timer", "matrix"],
     min: 2,
     repeatable: ["card"],
     families: [["chat", "list"]],
@@ -151,7 +185,8 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
   },
   tabs: {
     slots: 3,
-    allowed: ["chart", "table", "list", "form", "card", "board", "listings", "gallery", "feed", "comments", "map", "code", "settings", "details", "timeline"],
+    allowed: ["chart", "table", "list", "form", "card", "board", "listings", "gallery", "feed", "comments", "map", "code", "settings", "details", "timeline",
+      "breakdown", "week", "logs", "pipeline", "matrix", "people", "article", "reader"],
     min: 2,
     repeatable: ["chart", "table", "list", "card"],
     noneAllowed: true,
@@ -183,7 +218,10 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
  */
 export const PAGE_SET_MODE = process.env.JEV_PAGE_MODE === "set"
 export const PAGE_ORDER: Kind[] = [
-  "banner", "alert", "hero", "detail", "profile", "search", "stats", "steps", "board", "chat", "feed", "swipe",
+  "banner", "alert", "countdown", "hero", "detail", "profile", "stories", "search", "filters", "stats", "steps", "tracker",
+  "board", "chat", "reader", "call", "feed", "thread", "swipe", "quiz", "editor", "article", "itinerary", "ticket",
+  "cart", "choices", "wallet", "breakdown", "week", "days", "timer", "converter", "clocks", "scanner", "gauge", "logs",
+  "pipeline", "matrix", "invite", "people", "amenities",
   "player", "video", "forecast", "listings", "gallery", "carousel", "form",
   "timeslots", "chart", "table", "list", "map", "heatmap", "details", "settings", "calendar", "pricing", "comments",
   "features", "logos", "testimonial", "timeline", "code", "keypad", "accordion", "empty", "button", "searchbox",
@@ -273,7 +311,7 @@ export function detailQuestions(node: UINode, ctx: Ctx): DetailQuestion[] {
         choice("subtitle", "The supporting line under the headline.", opts(B.TAGLINES), page("tagline")),
         choice("cta", "The primary call-to-action button.", opts(B.BUTTONS), own("cta")),
         choice("cta2", "An optional secondary button.", withNone(B.BUTTONS), own("cta")),
-        choice("align", "How the hero is laid out.", { center: "centered text, classic landing page", left: "text on the left, image on the right" }),
+        choice("align", "How the hero is laid out.", { center: "centered text, classic landing page", left: "text on the left, image on the right", cover: "text over a full-width photo, for travel, events and places" }),
       )
       break
     case "stats":
@@ -308,13 +346,13 @@ export function detailQuestions(node: UINode, ctx: Ctx): DetailQuestion[] {
     case "chart":
       qs.push(
         choice("metric", "The metric this chart plots.", opts(keys(B.METRICS)), page("metric")),
-        choice("type", "The chart type that shows this metric best.", { area: "trend over time, filled", line: "trend over time", bar: "compare values across categories or periods", pie: "share of a whole" }),
+        choice("type", "The chart type that shows this metric best.", { area: "trend over time, filled", line: "trend over time", bar: "compare values across categories or periods", pie: "share of a whole", funnel: "drop-off through the steps of a flow" }),
         choice("x", "What the chart is broken down by.", { months: "months of the year", weeks: "recent weeks", weekdays: "days of the week", hours: "hours of the day", regions: "world regions", channels: "marketing channels", products: "product lines" }),
         choice("compare", "Whether to overlay the previous period.", { single: "one series", compare: "this period versus the previous one" }),
       )
       break
     case "table":
-      qs.push(title("table title"))
+      qs.push(title("table title"), choice("selectable", "Whether rows can be selected for bulk actions (admin tools, inboxes).", { no: "read-only rows", yes: "checkboxes and a bulk action bar" }))
       break
     case "list":
       qs.push(
@@ -470,6 +508,93 @@ export function detailQuestions(node: UINode, ctx: Ctx): DetailQuestion[] {
     case "checklist":
       qs.push({ type: "set", prop: "items", items: B.CHECKLIST, min: 3, max: 5, order: "rank", ask: (item) => `Is "${item}" something this includes?` })
       break
+    case "tracker":
+      qs.push(choice("subject", "What is being tracked.", B.TRACK_SUBJECTS))
+      break
+    case "countdown":
+      qs.push(choice("event", "What the countdown is for.", B.COUNTDOWN_EVENTS))
+      break
+    case "timer":
+      qs.push(choice("mode", "What kind of timer.", B.TIMER_MODES))
+      break
+    case "filters":
+      qs.push(
+        choice("layout", "How the filters sit.", { panel: "a vertical panel beside results", bar: "a horizontal bar above results" }),
+        { type: "set", prop: "facets", items: B.FACETS, min: 3, max: 5, order: "rank", ask: (item) => `Would people filter these results by "${item}"?` },
+      )
+      break
+    case "matrix":
+      qs.push(choice("mode", "What the grid shows.", B.MATRIX_MODES), choice("subject", "If it compares options, what they are.", B.COMPARE_SUBJECTS))
+      break
+    case "itinerary":
+      qs.push(choice("mode", "What kind of trip view.", B.TRIP_MODES))
+      break
+    case "ticket":
+      qs.push(choice("pass", "What kind of pass.", B.PASS_KINDS))
+      break
+    case "invite":
+      qs.push(choice("purpose", "Who is being invited.", B.INVITE_PURPOSES))
+      break
+    case "breakdown":
+      qs.push(choice("measure", "What is broken down.", B.BREAKDOWN_MEASURES), choice("style", "How it is drawn.", B.BREAKDOWN_STYLES))
+      break
+    case "wallet":
+      qs.push(choice("mode", "What the wallet holds.", B.WALLET_MODES))
+      break
+    case "stories":
+      qs.push(choice("mode", "What the avatar row is for.", B.STRIP_MODES))
+      break
+    case "people":
+      qs.push(choice("role", "Who these people are.", B.PEOPLE_ROLES))
+      break
+    case "cart":
+      qs.push(choice("items", "What is in the cart.", B.CART_KINDS))
+      break
+    case "editor":
+      qs.push(choice("mode", "What is being written.", B.EDITOR_MODES))
+      break
+    case "article":
+      qs.push(choice("type", "What kind of long-form page.", B.ARTICLE_TYPES))
+      break
+    case "week":
+      qs.push(choice("mode", "What the week grid shows.", B.WEEK_MODES))
+      break
+    case "choices":
+      qs.push(choice("mode", "What people choose between.", B.CHOICE_MODES))
+      break
+    case "quiz":
+      qs.push(choice("mode", "Which quiz screen.", B.QUIZ_MODES))
+      break
+    case "call":
+      qs.push(choice("mode", "Which call screen.", B.CALL_MODES))
+      break
+    case "reader":
+      qs.push(choice("mode", "What is open.", B.READER_MODES))
+      break
+    case "amenities":
+      qs.push(choice("place", "What the amenities belong to.", B.AMENITY_PLACES))
+      break
+    case "thread":
+      qs.push(choice("style", "What kind of discussion.", B.THREAD_STYLES))
+      break
+    case "scanner":
+      qs.push(choice("target", "What is being scanned.", B.SCAN_TARGETS))
+      break
+    case "gauge":
+      qs.push(choice("measure", "What the scale measures.", B.GAUGE_MEASURES))
+      break
+    case "days":
+      qs.push(choice("track", "What each day shows.", B.DAY_TRACKS))
+      break
+    case "logs":
+      qs.push(choice("source", "Where the logs come from.", B.LOG_SOURCES))
+      break
+    case "converter":
+      qs.push(choice("units", "What is converted.", B.CONVERTER_UNITS))
+      break
+    case "clocks":
+      qs.push(choice("cities", "Which cities.", B.CLOCK_SETS))
+      break
     case "media":
       qs.push(choice("items", "What this card shows.", B.LISTING_TYPES, ctx.parent ? `${ctx.parent.id}:media` : undefined))
       break
@@ -520,6 +645,9 @@ export function detailQuestions(node: UINode, ctx: Ctx): DetailQuestion[] {
       break
     case "price":
       qs.push(choice("tier", "How expensive this is.", B.PRICE_TIERS), choice("period", "What the price is per.", B.PRICE_PERIODS))
+      break
+    case "rating":
+      qs.push(choice("input", "Whether people give a rating here or just see one.", { display: "shows an existing rating", stars: "people tap stars to rate", emoji: "people pick an emoji face to rate" }))
       break
     case "status":
       qs.push(choice("state", "The state to show.", opts(B.STATUSES)))

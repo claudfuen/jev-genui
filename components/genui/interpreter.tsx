@@ -48,37 +48,11 @@ import {
 import { accentStyle } from "@/lib/genui/theme"
 import type { UINode } from "@/lib/genui/types"
 import { Icon } from "./icons"
+import { ASPECT, Frame, InterpreterContext, Placeholder, arr, confidence, nested, str, useNode } from "./kit"
+import { PRIMITIVE_VIEWS } from "./primitives"
 
-type Ctx = { seed: string; brand: string; highlight: string | null; overlay: boolean }
-const InterpreterContext = React.createContext<Ctx>({ seed: "", brand: "", highlight: null, overlay: false })
+export { confidence }
 
-const str = (v: unknown, fallback = "") => (typeof v === "string" && v !== "none" ? v : fallback)
-const arr = (v: unknown) => (Array.isArray(v) ? (v as string[]) : [])
-/** Nested inside a card-like parent, a molecule drops its own card frame. */
-const nested = (n: UINode) => n.path.split(".").length > 2 || n.depth >= 2
-
-export function confidence(n: UINode) {
-  const ps = n.decisions.map((d) => d.probability).filter((p): p is number => p != null)
-  return ps.length ? Math.min(...ps) : 1
-}
-
-function useNode(node: UINode) {
-  const { seed, highlight, overlay } = React.useContext(InterpreterContext)
-  const r = React.useMemo(() => rng(`${seed}|${node.path}|${node.kind}`), [seed, node.path, node.kind])
-  const c = confidence(node)
-  return {
-    r,
-    attrs: {
-      "data-node": node.id,
-      className: cn(
-        "animate-in fade-in-0 duration-500",
-        highlight === node.id && "ring-2 ring-primary ring-offset-2 ring-offset-background",
-        overlay && "outline-2 outline-offset-2 outline-dashed",
-        overlay && (c >= 0.75 ? "outline-emerald-500/70" : c >= 0.45 ? "outline-amber-500/80" : "outline-rose-500/80"),
-      ),
-    },
-  }
-}
 
 export function Interpreter({ tree, seed, highlight, overlay = false }: { tree: UINode; seed: string; highlight: string | null; overlay?: boolean }) {
   const brand = str(tree.props.brand, "")
@@ -101,7 +75,8 @@ export function Interpreter({ tree, seed, highlight, overlay = false }: { tree: 
 
   let body: React.ReactNode
   if (layout === "bare" && !tree.pending) {
-    body = <main className="flex min-h-[70svh] flex-col items-center justify-center gap-6 p-8">{sections}</main>
+    // Sections fill a centered column; items-center alone would shrink wide ones like a call grid.
+    body = <main className="mx-auto flex min-h-[70svh] w-full max-w-3xl flex-col justify-center gap-6 p-6 sm:p-8">{sections}</main>
   } else if (layout === "sidebar" && !tree.pending) {
     body = (
       <div className="flex min-h-[70svh]">
@@ -184,22 +159,6 @@ function PendingView({ node }: { node: UINode }) {
   )
 }
 
-/** A molecule's frame: a titled card at section level, bare when nested in a card. */
-function Frame({ node, title, action, children, className }: { node: UINode; title?: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
-  const { attrs } = useNode(node)
-  if (nested(node)) return <div {...attrs} className={cn(attrs.className, className)}>{children}</div>
-  return (
-    <Card {...attrs} className={cn(attrs.className, "h-full")}>
-      {(title || action) && (
-        <CardHeader>
-          {title && <CardTitle>{title}</CardTitle>}
-          {action && <CardAction>{action}</CardAction>}
-        </CardHeader>
-      )}
-      <CardContent className={className}>{children}</CardContent>
-    </Card>
-  )
-}
 
 // ---------------------------------------------------------------------------
 // Containers
@@ -271,6 +230,21 @@ function HeroView({ node }: { node: UINode }) {
   const subject = str(p.subject, "")
   const headline = str(p.headline, "Welcome").replace("{subject}", subject)
   const left = p.align === "left"
+  if (p.align === "cover") {
+    return (
+      <section {...attrs} className={cn(attrs.className, "overflow-hidden rounded-3xl")}>
+        <Placeholder seed={`${node.path}|cover`} aspect="banner" iconless className="min-h-80">
+          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-white sm:p-10">
+            {subject && <Badge variant="secondary" className="w-fit">{subject}</Badge>}
+            <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">{headline}</h1>
+            <p className="max-w-xl text-lg text-pretty text-white/85">{str(p.subtitle).replace("{subject}", subject || "you")}</p>
+            <div className="flex flex-wrap gap-3"><Button size="lg">{str(p.cta, "Get started")}</Button>{str(p.cta2) && <Button size="lg" variant="secondary">{str(p.cta2)}</Button>}</div>
+          </div>
+        </Placeholder>
+      </section>
+    )
+  }
   return (
     <section {...attrs} className={cn(attrs.className, "grid items-center gap-8 rounded-2xl py-10 sm:py-14", left ? "lg:grid-cols-2" : "text-center")}>
       <div className={cn("flex flex-col gap-5", !left && "mx-auto max-w-2xl items-center")}>
@@ -385,9 +359,10 @@ function StatsView({ node }: { node: UINode }) {
   )
 }
 
-function StatTile({ label, seed, bare }: { label: string; seed: string; bare?: boolean }) {
+function StatTile({ label, bare }: { label: string; seed?: string; bare?: boolean }) {
   const ctx = React.useContext(InterpreterContext)
-  const r = React.useMemo(() => rng(`${ctx.seed}|${seed}`), [ctx.seed, seed])
+  // Seeded by the metric, not the tile, so a metric reads the same everywhere on the page.
+  const r = React.useMemo(() => rng(`${ctx.seed}|metric|${label}`), [ctx.seed, label])
   const { value, delta, good } = metricValue(r, label)
   const Up = delta >= 0 ? ArrowUpRight : ArrowDownRight
   const body = (
@@ -460,6 +435,12 @@ function ChatView({ node }: { node: UINode }) {
           <div key={i} className={cn("max-w-[80%] rounded-2xl px-3.5 py-2 text-sm", l.me ? "self-end rounded-br-sm bg-primary text-primary-foreground" : "self-start rounded-bl-sm bg-muted")}>{l.text}</div>
         ))}
       </div>
+      {(persona === "team" || persona === "friends" || persona === "support") && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span className="flex gap-0.5 rounded-full bg-muted px-2.5 py-2">{[0, 1, 2].map((i) => <span key={i} className="size-1.5 animate-bounce rounded-full bg-muted-foreground/70" style={{ animationDelay: `${i * 0.15}s` }} />)}</span>
+          {persona === "team" ? `${PEOPLE[5].split(" ")[0]} is typing` : "typing"}
+        </div>
+      )}
       <InputGroup>
         <InputGroupAddon><Paperclip /></InputGroupAddon>
         <InputGroupInput placeholder="Write a message..." />
@@ -575,6 +556,9 @@ function MediaCard({ item }: { item: ReturnType<typeof listings>[number] }) {
         </div>
         <span className="text-sm text-muted-foreground">{item.meta}</span>
         {item.price && <span className="mt-1 font-semibold">{item.price}</span>}
+        {/^(Lesson|Unit|Module) /.test(item.meta) ? (
+          <div className="mt-2 flex flex-col gap-2"><Progress value={30 + (item.title.length * 7) % 60} /><Button size="sm" className="w-fit">Continue</Button></div>
+        ) : null}
       </div>
     </Card>
   )
@@ -834,7 +818,7 @@ function FormView({ node }: { node: UINode }) {
       <CardContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup className="gap-4">
-            {controls.map((c) => <Control key={c} id={`${node.id}-${c}`} label={c} type={types[c] ?? "field"} />)}
+            {controls.map((c) => <Control key={c} id={`${node.id}-${c}`} label={c} type={types[c] ?? "field"} strength={controls.includes("Confirm password")} />)}
             <Button type="submit" className="w-full">{str(p.submit, "Submit")}</Button>
           </FieldGroup>
         </form>
@@ -847,7 +831,22 @@ const SELECTS = new Set(Object.keys(FIELD_OPTIONS))
 const TEXTAREAS = new Set(["Message", "Notes", "Bio", "Description"])
 const DATES = new Set(["Date", "Date of birth", "Due date", "Start date", "End date"])
 
-function Control({ id, label, type }: { id: string; label: string; type: string }) {
+function PasswordField({ id, confirm }: { id: string; confirm?: boolean }) {
+  const [pw, setPw] = React.useState(confirm ? "" : "Sunset-2026")
+  const checks = [["8+ characters", pw.length >= 8], ["A number", /\d/.test(pw)], ["A symbol", /[^A-Za-z0-9]/.test(pw)], ["Upper and lower case", /[a-z]/.test(pw) && /[A-Z]/.test(pw)]] as const
+  const score = checks.filter(([, ok]) => ok).length
+  return (
+    <Field>
+      <FieldLabel htmlFor={id}>Password</FieldLabel>
+      <Input id={id} type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" />
+      <div className="flex gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className={cn("h-1 flex-1 rounded-full", i < score ? (score < 2 ? "bg-rose-500" : score < 4 ? "bg-amber-400" : "bg-emerald-500") : "bg-muted")} />)}</div>
+      <ul className="grid grid-cols-2 gap-1 text-xs">{checks.map(([t, ok]) => <li key={t} className={cn("flex items-center gap-1.5", ok ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}><Check className="size-3" />{t}</li>)}</ul>
+    </Field>
+  )
+}
+
+function Control({ id, label, type, strength }: { id: string; label: string; type: string; strength?: boolean }) {
+  if (label === "Password" && strength) return <PasswordField id={id} />
   if (type === "toggle") {
     if (B.CHECKBOX_TOGGLES.has(label)) {
       return <Field orientation="horizontal"><Checkbox id={id} defaultChecked={label === "Remember me"} /><FieldLabel htmlFor={id} className="font-normal">{label}</FieldLabel></Field>
@@ -906,16 +905,42 @@ function ChartView({ node }: { node: UINode }) {
   const x = str(p.x, "months")
   const labels = React.useMemo(() => axisLabels(x), [x])
   const compare = p.compare === "compare" && type !== "pie"
+  const ctx = React.useContext(InterpreterContext)
   // Memoized so re-renders during streaming do not restart recharts' entrance animation.
-  const { cur, data } = React.useMemo(() => {
-    const cur = series(r, metric, labels.length)
+  // The series ends on the same value the metric's stat tile shows, so they agree.
+  const { cur, data, headline } = React.useMemo(() => {
+    const anchor = metricValue(rng(`${ctx.seed}|metric|${metric}`), metric).value
+    const raw = series(r, metric, labels.length)
+    const scale = anchor / raw[raw.length - 1]
+    const cur = raw.map((v) => +(v * scale).toFixed(2))
     const data = labels.map((label, i) => ({ label, value: cur[i], previous: +(cur[i] * (0.72 + r() * 0.2)).toFixed(2) }))
-    return { cur, data }
-  }, [r, metric, labels])
-  const total = cur.reduce((a, b) => a + b, 0)
+    return { cur, data, headline: anchor }
+  }, [r, metric, labels, ctx.seed])
+  const total = headline
   const config = { value: { label: metric, color: "var(--chart-1)" }, previous: { label: "Previous period", color: "var(--chart-2)" } } satisfies ChartConfig
   const tick = { tickLine: false, axisLine: false, tickMargin: 8 } as const
 
+  if (type === "funnel") {
+    const steps = ["Visited", "Signed up", "Activated", "Subscribed", "Retained"]
+    const vals = steps.map((_, i) => Math.round(12000 * Math.pow(0.52 + (i % 2) * 0.1, i)))
+    return (
+      <Card {...attrs} className={cn(attrs.className, "gap-4 px-5")}>
+        <div className="flex items-end justify-between"><div><div className="text-sm text-muted-foreground">{metric}</div><div className="text-2xl font-semibold tabular-nums">{((vals[vals.length - 1] / vals[0]) * 100).toFixed(1)}% end to end</div></div><Badge variant="outline">Last 30 days</Badge></div>
+        <div className="flex flex-col gap-2">
+          {steps.map((st, i) => (
+            <div key={st} className="flex items-center gap-3 text-sm">
+              <span className="w-24 shrink-0 text-muted-foreground">{st}</span>
+              <div className="flex h-8 flex-1 items-center gap-2">
+                <div className="h-full rounded-md" style={{ width: `${(vals[i] / vals[0]) * 100}%`, background: `var(--chart-${(i % 5) + 1})` }} />
+                <span className="text-xs font-medium tabular-nums">{vals[i].toLocaleString("en-US")}</span>
+              </div>
+              <span className="w-14 text-right text-xs text-muted-foreground tabular-nums">{i ? `-${Math.round((1 - vals[i] / vals[i - 1]) * 100)}%` : ""}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+    )
+  }
   let chart: React.ReactElement
   if (type === "pie") {
     chart = (
@@ -966,14 +991,31 @@ function ChartView({ node }: { node: UINode }) {
 function TableView({ node }: { node: UINode }) {
   const { r } = useNode(node)
   const cols = arr(node.props.columns)
-  const rows = React.useMemo(() => Array.from({ length: 5 }, (_, i) => cols.map((c) => cell(r, c, i))), [r, cols])
+  const title = str(node.props.title, "Records")
+  const selectable = node.props.selectable === "yes"
+  const rows = React.useMemo(() => {
+    const offset = Math.floor(r() * PEOPLE.length)
+    return Array.from({ length: 5 }, (_, i) => cols.map((c) => cell(r, c, i, offset, title)))
+  }, [r, cols, title])
+  const [picked, setPicked] = React.useState<Set<number>>(() => new Set(selectable ? [1, 3] : []))
+  const toggle = (i: number) => setPicked((p) => { const n = new Set(p); if (n.has(i)) n.delete(i); else n.add(i); return n })
   return (
-    <Frame node={node} title={str(node.props.title, "Records")} action={<Button variant="ghost" size="sm">View all</Button>}>
+    <Frame node={node} title={title} action={<Button variant="ghost" size="sm">View all</Button>}>
+      {selectable && picked.size > 0 && (
+        <div className="mb-2 flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 text-sm">
+          <span className="font-medium">{picked.size} selected</span>
+          <div className="ml-auto flex gap-1"><Button variant="ghost" size="sm">Export</Button><Button variant="ghost" size="sm">Archive</Button><Button variant="ghost" size="sm" className="text-destructive">Delete</Button></div>
+        </div>
+      )}
       <Table>
-        <TableHeader><TableRow>{cols.map((c, i) => <TableHead key={c} className={cn(i === cols.length - 1 && cols.length > 2 && "text-right")}>{c}</TableHead>)}</TableRow></TableHeader>
+        <TableHeader><TableRow>
+          {selectable && <TableHead className="w-8"><Checkbox checked={picked.size === rows.length} onCheckedChange={(v) => setPicked(new Set(v ? rows.map((_, i) => i) : []))} aria-label="Select all" /></TableHead>}
+          {cols.map((c, i) => <TableHead key={c} className={cn(i === cols.length - 1 && cols.length > 2 && "text-right")}>{c}</TableHead>)}
+        </TableRow></TableHeader>
         <TableBody>
           {rows.map((row, i) => (
-            <TableRow key={i}>
+            <TableRow key={i} data-state={picked.has(i) ? "selected" : undefined}>
+              {selectable && <TableCell><Checkbox checked={picked.has(i)} onCheckedChange={() => toggle(i)} aria-label={`Select row ${i + 1}`} /></TableCell>}
               {row.map((c, j) => <TableCell key={j} className={cn(j === 0 && "font-medium", j === row.length - 1 && row.length > 2 && "text-right")}>{c.badge ? <Badge variant={c.badge}>{c.text}</Badge> : c.text}</TableCell>)}
             </TableRow>
           ))}
@@ -1210,53 +1252,6 @@ function AvatarsView({ node }: { node: UINode }) {
   )
 }
 
-const ASPECT: Record<string, string> = {
-  wide: "aspect-video", square: "aspect-square", portrait: "aspect-[3/4]", photo: "aspect-[4/3]", banner: "aspect-[3/1]", tall: "aspect-[2/3]",
-}
-
-/**
- * The image placeholder every photo slot uses: an accent-tinted gradient mesh,
- * a seeded texture, the subject's icon and an optional caption. Deterministic
- * per slot, so it never flickers while you type.
- */
-function Placeholder({ seed, icon, label, aspect = "photo", className, children, iconless }: {
-  seed: string; icon?: unknown; label?: string; aspect?: string; className?: string; children?: React.ReactNode; iconless?: boolean
-}) {
-  const ctx = React.useContext(InterpreterContext)
-  const id = React.useId().replace(/:/g, "")
-  const { blobs, pattern } = React.useMemo(() => {
-    const r = rng(`ph|${ctx.seed}|${seed}`)
-    return {
-      blobs: Array.from({ length: 3 }, () => ({ x: r() * 100, y: r() * 100, size: 45 + r() * 55, o: 0.25 + r() * 0.35 })),
-      pattern: Math.floor(r() * 4),
-    }
-  }, [ctx.seed, seed])
-  return (
-    <div className={cn("relative isolate grid w-full place-items-center overflow-hidden bg-muted", ASPECT[aspect] ?? ASPECT.photo, className)}>
-      <div className="absolute inset-0 -z-10 bg-linear-to-br from-primary/40 via-primary/15 to-primary/5" />
-      {blobs.map((b, i) => (
-        <div key={i} className="absolute -z-10 rounded-full bg-primary blur-2xl" style={{ left: `${b.x}%`, top: `${b.y}%`, width: `${b.size}%`, height: `${b.size}%`, opacity: b.o, transform: "translate(-50%, -50%)" }} />
-      ))}
-      {pattern < 3 && (
-        <svg className="absolute inset-0 -z-10 size-full text-foreground/[0.08]" aria-hidden>
-          <defs>
-            <pattern id={`p${id}`} width="16" height="16" patternUnits="userSpaceOnUse" patternTransform={pattern === 1 ? "rotate(45)" : undefined}>
-              {pattern === 0 ? <circle cx="2" cy="2" r="1.2" fill="currentColor" /> : pattern === 1 ? <path d="M0 0V16" stroke="currentColor" strokeWidth="1.5" /> : <path d="M16 0H0V16" fill="none" stroke="currentColor" />}
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill={`url(#p${id})`} />
-        </svg>
-      )}
-      {!iconless && (
-        <div className="grid size-11 place-items-center rounded-full bg-background/70 text-primary shadow-sm ring-1 ring-foreground/5 backdrop-blur">
-          <Icon name={icon ?? "image"} className="size-5" />
-        </div>
-      )}
-      {label && <span className="absolute bottom-2 left-2 max-w-[80%] truncate rounded-md bg-background/75 px-1.5 py-0.5 text-[11px] text-muted-foreground backdrop-blur">{label}</span>}
-      {children}
-    </div>
-  )
-}
 
 function ImageView({ node }: { node: UINode }) {
   const { attrs } = useNode(node)
@@ -1281,8 +1276,29 @@ function PriceView({ node }: { node: UINode }) {
   )
 }
 
+const FACES = ["😞", "🙁", "😐", "🙂", "😍"]
+const FACE_LABELS = ["Awful", "Poor", "Okay", "Good", "Great"]
 function RatingView({ node }: { node: UINode }) {
   const { r, attrs } = useNode(node)
+  const input = str(node.props.input, "display")
+  const [val, setVal] = React.useState(0)
+  const [hover, setHover] = React.useState(0)
+  if (input === "emoji") {
+    return (
+      <div {...attrs} className={cn(attrs.className, "flex flex-col items-center gap-2")}>
+        <div className="flex gap-2">{FACES.map((f, i) => <button key={f} type="button" onClick={() => setVal(i + 1)} aria-label={FACE_LABELS[i]} className={cn("grid size-12 place-items-center rounded-full text-2xl transition-transform hover:scale-110", val === i + 1 ? "bg-primary/15 ring-2 ring-primary" : "bg-muted grayscale-[40%]")}>{f}</button>)}</div>
+        <span className="h-5 text-sm text-muted-foreground">{val ? FACE_LABELS[val - 1] : "How was it?"}</span>
+      </div>
+    )
+  }
+  if (input === "stars") {
+    return (
+      <div {...attrs} className={cn(attrs.className, "flex items-center gap-3")} onMouseLeave={() => setHover(0)}>
+        <div className="flex">{Array.from({ length: 5 }, (_, i) => <button key={i} type="button" aria-label={`${i + 1} stars`} onMouseEnter={() => setHover(i + 1)} onClick={() => setVal(i + 1)}><Star className={cn("size-8 transition-colors", i < (hover || val) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40")} /></button>)}</div>
+        <span className="text-sm text-muted-foreground">{hover || val ? FACE_LABELS[(hover || val) - 1] : "Tap to rate"}</span>
+      </div>
+    )
+  }
   const { score, count } = React.useMemo(() => ({ score: +between(r, 4.2, 4.95).toFixed(1), count: Math.round(between(r, 40, 3200)) }), [r])
   return (
     <div {...attrs} className={cn(attrs.className, "flex items-center gap-2 text-sm")}>
@@ -1379,7 +1395,7 @@ function DetailView({ node }: { node: UINode }) {
             {item.facts.map(([k, v]) => <div key={k}><div className="font-semibold">{v}</div><div className="text-xs text-muted-foreground">{k}</div></div>)}
           </div>
         )}
-        {kind === "product" && <SwatchPicker kind="colors and sizes" />}
+        {kind === "product" && <SwatchPicker kind="colors and sizes" shoes={/shoe|sneaker|boot|heel|sandal/i.test(name)} />}
         <div className="flex gap-3">
           {(kind === "product" || kind === "dish") && <Stepper />}
           <Button size="lg" className="flex-1">{str(node.props.cta, "Add to cart")}</Button>
@@ -1410,7 +1426,7 @@ function StarsLine({ seed }: { seed: string }) {
 }
 
 const COLORS = ["oklch(0.25 0 0)", "oklch(0.93 0 0)", "oklch(0.55 0.12 60)", "oklch(0.5 0.1 250)", "oklch(0.55 0.12 150)"]
-function SwatchPicker({ kind }: { kind: string }) {
+function SwatchPicker({ kind, shoes }: { kind: string; shoes?: boolean }) {
   const [color, setColor] = React.useState(0)
   const [size, setSize] = React.useState("M")
   return (
@@ -1429,8 +1445,8 @@ function SwatchPicker({ kind }: { kind: string }) {
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">Size</span>
           <div className="flex flex-wrap gap-2">
-            {["XS", "S", "M", "L", "XL"].map((sz) => (
-              <button key={sz} type="button" onClick={() => setSize(sz)} className={cn("h-9 min-w-11 rounded-md border px-3 text-sm", size === sz ? "border-primary bg-primary text-primary-foreground" : "hover:bg-muted", sz === "XS" && "text-muted-foreground line-through")}>{sz}</button>
+            {(shoes ? ["7", "8", "9", "10", "11", "12"] : ["XS", "S", "M", "L", "XL"]).map((sz, i) => (
+              <button key={sz} type="button" onClick={() => setSize(sz)} className={cn("h-9 min-w-11 rounded-md border px-3 text-sm", size === sz || (!["XS", "S", "M", "L", "XL", ...(shoes ? ["7", "8", "9", "10", "11", "12"] : [])].includes(size) && i === 2) ? "border-primary bg-primary text-primary-foreground" : "hover:bg-muted", i === 0 && "text-muted-foreground line-through")}>{sz}</button>
             ))}
           </div>
         </div>
@@ -1773,6 +1789,20 @@ function UploadView({ node }: { node: UINode }) {
   const { attrs } = useNode(node)
   const accept = str(node.props.accept, "any file")
   const photos = accept === "photos"
+  if (accept === "avatar") {
+    return (
+      <div {...attrs} className={cn(attrs.className, "flex items-center gap-5")}>
+        <div className="relative">
+          <Avatar className="size-20"><AvatarFallback className="text-xl">{initials(PEOPLE[0])}</AvatarFallback></Avatar>
+          <span className="absolute -right-1 -bottom-1 grid size-7 place-items-center rounded-full bg-primary text-primary-foreground ring-2 ring-background"><Icon name="camera" className="size-3.5" /></span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2"><Button size="sm"><UploadCloud />Upload photo</Button><Button size="sm" variant="ghost">Remove</Button></div>
+          <span className="text-xs text-muted-foreground">JPG or PNG, at least 400 by 400 pixels.</span>
+        </div>
+      </div>
+    )
+  }
   return (
     <div {...attrs} className={cn(attrs.className, "flex w-full flex-col gap-3")}>
       <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center">
@@ -1833,6 +1863,7 @@ function ChecklistView({ node }: { node: UINode }) {
 }
 
 const VIEWS: Partial<Record<UINode["kind"], React.ComponentType<{ node: UINode }>>> = {
+  ...PRIMITIVE_VIEWS,
   grid: GridView, split: SplitView, tabs: TabsView, card: CardView, row: RowView,
   hero: HeroView, stats: StatsView, form: FormView, chart: ChartView, table: TableView, list: ListView,
   board: BoardView, chat: ChatView, player: PlayerView, pricing: PricingView, profile: ProfileView,

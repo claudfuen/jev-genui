@@ -14,15 +14,15 @@ import type { ComposeEvent, Overrides, RoundStat, UINode } from "@/lib/genui/typ
 
 const SUGGESTIONS = [
   "sales dashboard for a coffee shop",
+  "flight search results page",
   "kanban board for a design team",
-  "chat app for customer support",
-  "pricing page for a saas",
+  "video call interface with grid view",
+  "product page for a leather bag",
+  "my bank app home screen",
+  "forum thread with nested replies",
   "tinder for dogs",
-  "checkout for a sneaker store",
-  "music player",
-  "hotel search results in lisbon",
-  "crm for a law firm",
-  "landing page for a surf school",
+  "flashcard app for studying vocabulary",
+  "CI/CD pipeline dashboard with build stages",
 ]
 
 const REPO = "https://github.com/claudfuen/jev-genui"
@@ -306,6 +306,9 @@ function Status({ status, meta, error }: { status: string; meta: { totalMs: numb
 function TopBar() {
   return (
     <div className="flex items-center justify-end gap-1 p-3">
+      <Button variant="ghost" size="sm" nativeButton={false} render={<a href="/primitives" />}>
+        Primitives
+      </Button>
       <Button variant="ghost" size="sm" nativeButton={false} render={<a href={REPO} target="_blank" rel="noreferrer" />}>
         GitHub
       </Button>

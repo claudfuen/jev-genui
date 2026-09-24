@@ -1,0 +1,802 @@
+[
+ {
+  "q": "sign in page with email and password",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "sign up form with social login options",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "a simple login screen",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "2FA verification code entry screen",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "password reset request form",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "new password creation screen after reset",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "multi-step onboarding wizard for a fitness app",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "invite teammates to workspace screen",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "forgot password flow with email confirmation",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "checkout without account creation",
+  "category": "auth and onboarding (sign in, sign up, 2FA, password reset, onboarding wizard, invites)"
+ },
+ {
+  "q": "my bank app home screen",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "checkout without account creation",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "invoice detail page for a design agency",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "budgeting app dashboard",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "crypto portfolio tracker",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "send money to a friend screen",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "credit card bill payment page",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "stock trading app watchlist",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "expense tracker with categories",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "monthly spending breakdown chart",
+  "category": "finance and fintech (banking, budgeting, investing, crypto, invoices, payments)"
+ },
+ {
+  "q": "product listing page with filters",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "shopping cart page",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "checkout page",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "product detail page with reviews",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "my orders page",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "order tracking screen",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "checkout without account creation",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "return and refund request form",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "wishlist page for saved items",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "category page for a shoe store",
+  "category": "e-commerce storefront (catalog, product, cart, checkout, orders, returns)"
+ },
+ {
+  "q": "user management table with roles",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "admin dashboard with sidebar nav",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "edit user modal with permissions checkboxes",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "content moderation queue for flagged posts",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "role based access control settings page",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "invite team members with role dropdown",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "audit log viewer with filters",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "user list with search and pagination",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "admin panel to manage subscriptions",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "bulk actions toolbar for user table",
+  "category": "admin panels and internal tools (CRUD, users, permissions, moderation)"
+ },
+ {
+  "q": "a kanban board for my team's tasks",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "simple to-do list app",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "calendar app with month and week view",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "note-taking app like Notion",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "time tracking app for freelancers",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "daily planner with habit tracker",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "project management dashboard for a small agency",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "checklist app for grocery shopping",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "meeting notes template with action items",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "weekly agenda view with drag and drop tasks",
+  "category": "productivity (to-do, calendar, notes, kanban, docs, time tracking)"
+ },
+ {
+  "q": "404 page not found",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "empty state for no search results",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "pricing page with three tiers",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "FAQ page for a saas product",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "maintenance mode page",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "500 server error page",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "empty inbox illustration",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "terms of service page",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "empty shopping cart state",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "pricing table with monthly and yearly toggle",
+  "category": "edge and system pages (404, empty states, errors, maintenance, legal, FAQ, pricing)"
+ },
+ {
+  "q": "account settings page",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "profile edit screen",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "billing and subscription page",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "notification preferences panel",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "security settings with 2FA",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "team members management page",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "invoice detail page for a design agency",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "change password form",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "update payment method screen",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "user roles and permissions table",
+  "category": "settings and account (profile, billing, notifications, security, team)"
+ },
+ {
+  "q": "simple contact form with name email message",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "multi-step job application form with progress bar",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "customer feedback survey with star ratings",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "quiz app with timer and score at end",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "newsletter signup form with email only",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "event registration form with ticket options",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "contact us page for a photography studio",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "multi-step checkout form without account creation",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "feedback form with emoji rating scale",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "job application form with resume upload",
+  "category": "forms and surveys (contact, applications, multi-step, feedback, quizzes)"
+ },
+ {
+  "q": "flight search results page",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "hotel booking checkout page",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "my trip itinerary screen",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "search flights with filters sidebar",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "hotel room comparison view",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "flight booking confirmation page",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "checkout without account creation",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "multi-city flight search form",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "boarding pass mobile screen",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "hotel search with map view",
+  "category": "travel and hospitality (search, flights, hotels, booking, itinerary)"
+ },
+ {
+  "q": "email inbox with sidebar folders",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "chat app conversation screen",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "video call interface with grid view",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "notification center dropdown",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "compose new email window",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "group chat with typing indicator",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "inbox zero style email client",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "incoming call screen for mobile",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "dm interface like twitter messages",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "notification settings toggle list",
+  "category": "communication (email, chat, video calls, notification center)"
+ },
+ {
+  "q": "SaaS landing page with pricing tiers",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "hero section for a productivity app",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "agency portfolio homepage",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "event landing page with countdown timer",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "nonprofit donation page",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "waitlist signup page for new app",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "landing page for a fitness app launch",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "pricing page with monthly and yearly toggle",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "testimonials section for marketing site",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "conference landing page with speaker lineup",
+  "category": "marketing and landing pages (SaaS, agency, app, event, nonprofit)"
+ },
+ {
+  "q": "food delivery order tracking screen",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "restaurant menu page with photos",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "checkout without account creation for food order",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "table reservation booking screen for restaurant",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "recipe detail page with ingredients and steps",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "coffee shop mobile ordering app",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "food delivery app home screen",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "restaurant search and filter by cuisine",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "order confirmation page for takeout",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "my food delivery app",
+  "category": "food and restaurants (menus, ordering, delivery tracking, recipes, reservations)"
+ },
+ {
+  "q": "real estate listing page with photo gallery",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "job board homepage with search filters",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "car listing grid with price and mileage",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "apartment rental search results map view",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "freelancer profile page with portfolio and reviews",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "property detail page with contact agent button",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "job application form for a listing",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "car dealership inventory page",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "rental listing card with amenities icons",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "freelancer gig marketplace homepage",
+  "category": "marketplaces and listings (real estate, jobs, cars, rentals, freelancers)"
+ },
+ {
+  "q": "a social media feed like instagram",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "user profile page with bio and stats",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "forum thread with nested replies",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "group chat member list",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "my discord server homepage",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "followers and following list screen",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "community forum homepage with categories",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "edit profile page with avatar upload",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "notifications feed for social app",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "a reddit-style post with upvotes and comments",
+  "category": "social and community (feed, profile, groups, forums, followers)"
+ },
+ {
+  "q": "workout tracker home screen",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "weekly step count dashboard",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "log a meal screen",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "calorie counter with barcode scanner",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "telehealth video call waiting room",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "book a doctor appointment",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "my fitness app",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "workout plan for the week",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "water intake tracker",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "heart rate monitor screen during a run",
+  "category": "health and fitness (activity tracking, workouts, nutrition, telehealth, appointments)"
+ },
+ {
+  "q": "flashcard app for studying vocabulary",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "course dashboard showing enrolled classes",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "quiz screen with multiple choice answers",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "student progress tracker with grades",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "online course landing page",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "lesson video player with notes sidebar",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "LMS admin panel for teachers",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "interactive quiz with timer and score",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "study planner calendar for students",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "course catalog with search and filters",
+  "category": "education (courses, lessons, quizzes, flashcards, LMS)"
+ },
+ {
+  "q": "API documentation page with code snippets",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "CI/CD pipeline dashboard with build stages",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "system status page with uptime history",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "deployment history log viewer",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "real-time error logs console",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "service health monitoring dashboard",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "API key management settings page",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "webhook configuration and testing panel",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "incident timeline with severity tags",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "build failure notification screen",
+  "category": "developer tools (API docs, logs, deployments, monitoring, status pages, CI)"
+ },
+ {
+  "q": "music player app now playing screen",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "podcast app episode list",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "streaming service home page like Netflix",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "photo gallery grid view",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "video streaming app for a movie",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "news app homepage with top stories",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "playlist creation screen for music app",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "spotify-like artist profile page",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "live TV guide interface",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "photo editing app with filters",
+  "category": "media and entertainment (music, video, podcasts, streaming, news, photos)"
+ },
+ {
+  "q": "a simple tip calculator",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "weather app for the week",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "pomodoro timer with breaks",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "countdown timer to New Year's",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "unit converter for cooking measurements",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "world clock for multiple time zones",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "basic calculator like iPhone",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "BMI calculator with height and weight",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "currency converter with live rates",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "stopwatch with lap times",
+  "category": "utilities and widgets (calculators, weather, timers, converters, clocks, simple games)"
+ },
+ {
+  "q": "SaaS admin dashboard with revenue charts",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "user analytics dashboard like Mixpanel",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "subscription billing overview page",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "dark mode analytics dashboard",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "dashboard showing MRR and churn rate",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "my startup's metrics dashboard",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "team performance dashboard with charts",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "onboarding funnel analytics screen",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "dashboard with sidebar nav and KPI cards",
+  "category": "SaaS dashboards and analytics"
+ },
+ {
+  "q": "customer usage analytics for a SaaS app",
+  "category": "SaaS dashboards and analytics"
+ }
+]

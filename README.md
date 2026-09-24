@@ -27,11 +27,13 @@ A typical page takes 2 to 3 rounds, under a second.
 
 ## What it can compose
 
-About 70 component kinds: dashboards (KPI tiles, charts, tables, heatmaps), apps (kanban, chat,
-feeds, to-do lists, settings, booking time slots, maps), commerce (product pages with gallery,
-swatches and cart, listings, pricing, order summaries), media (galleries, carousels, video, music
-player), marketing (hero, features, logos, testimonials, CTA, footer), plus atoms like progress
-rings, file upload, pagination and one-time-code inputs. Every photo slot is a seeded placeholder.
+About 100 component kinds, chosen from a coverage study of 200 real prompts across 20 categories
+(`evals/coverage/`): the vocabulary covers 98% of those use cases. Dashboards (KPIs, charts,
+tables, funnels, heatmaps, breakdowns), apps (kanban, chat, email reader, video calls, feeds,
+forum threads, week calendars, to-dos, editors), commerce (product pages, carts, filters,
+listings, pricing, wallets), travel (flight results, itineraries, boarding passes, maps), learning
+(quizzes, flashcards, courses), tools (timers, converters, world clocks, scanners, logs, CI
+pipelines), and marketing pages. Browse every primitive live at `/primitives`.
 
 ## Play with it
 

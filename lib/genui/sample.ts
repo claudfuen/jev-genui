@@ -157,16 +157,31 @@ export function series(r: Rand, label: string, n: number) {
 
 export type Cell = { text: string; badge?: "default" | "secondary" | "outline" | "destructive" }
 
-export function cell(r: Rand, col: string, row: number): Cell {
-  const person = PEOPLE[(row * 5 + Math.floor(r() * 3)) % PEOPLE.length]
+/** Status words that fit what the table is about ("Failed" is not a patient status). */
+function statusSet(title: string): [string[], string[], string[]] {
+  const t = title.toLowerCase()
+  if (/patient/.test(t)) return [["Admitted", "In treatment", "Scheduled", "Discharged"], ["Discharged"], []]
+  if (/client|customer|lead|contact|member|user|candidate|student/.test(t)) return [["Active", "New", "Inactive", "Onboarding"], ["Active"], []]
+  if (/order|transaction|invoice|payment|sale/.test(t)) return [["Paid", "Pending", "Shipped", "Refunded"], ["Paid", "Shipped"], ["Refunded"]]
+  if (/ticket|support|incident|issue|bug/.test(t)) return [["Open", "Pending", "Solved", "Escalated"], ["Solved"], ["Escalated"]]
+  if (/server|service|status|deploy|system|uptime/.test(t)) return [["Healthy", "Degraded", "Healthy", "Maintenance"], ["Healthy"], ["Degraded"]]
+  if (/case|matter/.test(t)) return [["Open", "Discovery", "Settled", "Closed"], ["Settled"], []]
+  if (/booking|reservation|appointment/.test(t)) return [["Confirmed", "Pending", "Checked in", "Cancelled"], ["Confirmed", "Checked in"], ["Cancelled"]]
+  return [STATUSES, ["Active", "Completed"], ["Failed"]]
+}
+
+/** One person per row, so a row's name and email always belong together. */
+export function cell(r: Rand, col: string, row: number, offset = 0, title = ""): Cell {
+  const person = PEOPLE[(row * 5 + offset) % PEOPLE.length]
   switch (col) {
     case "Name": case "Customer": case "Client": case "Assignee":
       return { text: person }
     case "Email":
       return { text: `${person.split(" ")[0].toLowerCase()}@example.com` }
     case "Status": {
-      const s = pick(r, STATUSES)
-      return { text: s, badge: s === "Failed" ? "destructive" : s === "Active" || s === "Completed" ? "default" : "secondary" }
+      const [set, good, bad] = statusSet(title)
+      const s = set[(row + offset) % set.length]
+      return { text: s, badge: bad.includes(s) ? "destructive" : good.includes(s) ? "default" : "secondary" }
     }
     case "Priority": {
       const p = pick(r, ["Low", "Medium", "High", "Urgent"])
@@ -263,6 +278,15 @@ export function listItems(r: Rand, kind: string, n = 4): ListItem[] {
         const ch = between(r, -6, 9)
         return { title: name, meta: `${between(r, 0.1, 40).toFixed(2)} ${sym}`, trailing: `${ch >= 0 ? "+" : ""}${ch.toFixed(1)}%`, positive: ch >= 0 }
       }
+      case "watchlist": {
+        const t = [["AAPL", "Apple"], ["NVDA", "Nvidia"], ["BTC", "Bitcoin"], ["TSLA", "Tesla"], ["ETH", "Ethereum"], ["MSFT", "Microsoft"]][(i + taskOffset) % 6]
+        const ch = between(r, -4, 6)
+        return { title: t[0], meta: t[1], trailing: `$${between(r, 40, 900).toFixed(2)}  ${ch >= 0 ? "+" : ""}${ch.toFixed(2)}%`, positive: ch >= 0 }
+      }
+      case "categories": {
+        const c = [["Announcements", "News and updates from the team", "megaphone"], ["General", "Talk about anything", "message"], ["Help and support", "Ask questions, get answers", "shield"], ["Show and tell", "Share what you made", "sparkles"], ["Feature requests", "Ideas for the product", "rocket"]][(i + taskOffset) % 5]
+        return { title: c[0], meta: c[1], trailing: `${Math.round(between(r, 12, 900))} topics` }
+      }
       case "tracks": {
         const t = TRACKS.music[i % TRACKS.music.length]
         return { title: t.title, meta: t.by, trailing: t.length }
@@ -327,6 +351,8 @@ export const BOARD_CARDS: Record<string, string[]> = {
   hiring: PEOPLE.slice(0, 9),
   "sales deals": ["Northwind, 40 seats", "Globex renewal", "Initech pilot", "Vandelay expansion", "Brightline, 12 seats", "Summit Labs", "Bluefin annual", "Parallel trial", "Acme upgrade"],
   "content calendar": ["Launch announcement", "Customer story", "Weekly newsletter", "How-to video", "Case study", "Podcast episode", "Behind the scenes", "Product tips", "Year in review"],
+  "legal matters": ["Estate of Hughes", "Northwind v. Globex", "Lease dispute, 4th Ave", "Vandelay acquisition", "Patel trademark filing", "Employment claim, Kim", "Brightline contract review", "Bluefin settlement", "Harbor zoning appeal"],
+  "service jobs": ["Lawn mowing, Oak St", "Hedge trimming, Elm Ave", "Gutter cleaning, 5th St", "Leaf removal, Pine Rd", "Sprinkler repair, Maple Ct", "Weekly mow, Cedar Ln", "Tree pruning, Birch Way", "Mulching, Aspen Dr", "Sod install, Spruce St"],
   "support tickets": ["Cannot reset password", "Refund request", "Invoice missing", "App crashes on start", "Change my plan", "Shipping delay", "Add a teammate", "Wrong size", "Double charged"],
   "orders to fulfil": ["#1042, 2 items", "#1043, 1 item", "#1044, 5 items", "#1045, 3 items", "#1046, 1 item", "#1047, 2 items", "#1048, 4 items", "#1049, 1 item", "#1050, 2 items"],
 }
@@ -458,6 +484,7 @@ const LISTINGS: Record<string, { icon: string; titles: string[]; meta: string[];
   dishes: { icon: "utensils", titles: ["Margherita", "Spicy salami", "Truffle mushroom", "Four cheese", "Garden veggie", "Burrata special"], meta: ["Tomato, mozzarella, basil", "Salami, chili honey", "Mushrooms, truffle oil", "Four Italian cheeses"], price: (r) => `$${Math.round(between(r, 11, 24))}`, rated: true, badges: ["Popular", "Vegetarian", "Spicy"] },
   services: { icon: "user-plus", titles: ["GreenCut Lawn Care", "Sparkle Cleaning Co.", "Handy Hank", "Blue Wave Pools", "Swift Movers", "Paws and Walks"], meta: ["2.1 mi · Available today", "0.8 mi · Next slot 3:00 PM", "3.4 mi · Available tomorrow"], price: (r) => `from $${Math.round(between(r, 25, 120))}`, rated: true, badges: ["Top pro", "Fast response", "Background checked"] },
   workshops: { icon: "calendar", titles: ["Intro to ceramics", "Sourdough basics", "Portrait photography", "Watercolor weekend", "Knife skills", "Public speaking"], meta: ["Sat, Oct 4 · 10:00 AM · 8 spots left", "Sun, Oct 12 · 2:00 PM · 3 spots left", "Thu, Oct 16 · 6:30 PM · 12 spots left"], price: (r) => `$${Math.round(between(r, 35, 180))}`, rated: true, badges: ["Few spots left", "New", "Beginner friendly"] },
+  enrolled: { icon: "graduation-cap", titles: ["UX design foundations", "Spanish for travelers", "Intro to Python", "Watercolor basics", "Marketing analytics", "Public speaking"], meta: ["Lesson 7 of 24", "Unit 3 of 8", "Module 5 of 10"], rated: false, badges: ["In progress", "New lesson", "Due Friday"] },
   classes: { icon: "dumbbell", titles: ["Sunrise flow", "Power hour", "Beginner basics", "Evening stretch", "Strength circuit", "Weekend intensive"], meta: ["Mon, Wed · 7:00 AM", "Tue, Thu · 6:00 PM", "Sat · 9:00 AM"], price: (r) => `$${Math.round(between(r, 15, 40))}`, rated: true, badges: ["Beginner", "Popular", "Few spots left"] },
 }
 

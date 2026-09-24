@@ -264,6 +264,8 @@ export const LIST_KINDS: Record<string, [items: string, description: string]> = 
   Integrations: ["apps", "connected apps and integrations"],
   Services: ["services", "systems with a health status"],
   Leaderboard: ["leaderboard", "people ranked by score"],
+  Watchlist: ["watchlist", "stocks or coins with live price and change"],
+  Categories: ["categories", "forum or help categories with counts"],
   Tracks: ["tracks", "songs with durations"],
   Episodes: ["tracks", "podcast episodes with durations"],
 }
@@ -405,13 +407,14 @@ export const LISTING_TYPES: Record<string, string> = {
   classes: "fitness or hobby classes",
   services: "local service providers or pros to hire",
   dishes: "menu items or dishes with prices",
+  enrolled: "courses or programs the person is part way through",
   workshops: "workshops or events to sign up for",
 }
 
 export const LISTING_TITLES: Record<string, string> = {
   products: "Products", homes: "Homes for sale", hotels: "Places to stay", courses: "Courses", recipes: "Recipes",
   events: "Upcoming events", articles: "Latest articles", cars: "Cars for sale", restaurants: "Restaurants nearby",
-  jobs: "Open roles", classes: "Classes", services: "Pros near you", workshops: "Upcoming workshops", dishes: "Menu",
+  jobs: "Open roles", classes: "Classes", services: "Pros near you", workshops: "Upcoming workshops", dishes: "Menu", enrolled: "Continue learning",
 }
 
 export const SEARCH_SCOPES = ["everything", "products", "homes", "hotels", "people", "messages", "emails", "jobs", "courses", "docs", "recipes", "events", "pets", "tasks", "files", "music", "customers", "services", "workshops"]
@@ -565,12 +568,59 @@ export const CODE_SNIPPETS: Record<string, string> = {
 }
 
 export const SWATCH_KINDS: Record<string, string> = { colors: "color choices", sizes: "size choices", "colors and sizes": "both colors and sizes" }
-export const UPLOAD_KINDS: Record<string, string> = { photos: "images", documents: "PDFs and documents", "any file": "any file", spreadsheet: "CSV or spreadsheet" }
+export const UPLOAD_KINDS: Record<string, string> = { avatar: "a profile photo", photos: "images", documents: "PDFs and documents", "any file": "any file", spreadsheet: "CSV or spreadsheet" }
 export const CHECKLIST = [
   "Free delivery", "Free returns", "2-year warranty", "Setup included", "Materials included", "Lifetime access",
   "Certificate of completion", "Cancel anytime", "24/7 support", "Secure payment", "Handmade", "Sustainably sourced",
   "Breakfast included", "Free cancellation", "Parking available", "Pet friendly",
 ]
+
+// --- Coverage-study primitives (evals/coverage) ---------------------------------
+
+export const TRACK_SUBJECTS: Record<string, string> = {
+  order: "an online order", delivery: "a food delivery on its way", shipment: "a package shipment",
+  application: "a job or loan application", repair: "a repair or service request", ride: "a ride on its way",
+}
+export const COUNTDOWN_EVENTS: Record<string, string> = {
+  launch: "a product launch", sale: "a sale that ends soon", event: "an event that starts soon",
+  maintenance: "service back online", offer: "an offer that expires", "new year": "a holiday or celebration",
+}
+export const TIMER_MODES: Record<string, string> = {
+  stopwatch: "stopwatch with laps", timer: "countdown timer", pomodoro: "focus sessions with breaks", tracker: "time tracking for projects",
+}
+export const FACETS = [
+  "Price range", "Rating", "Brand", "Size", "Color", "Category", "Availability", "Distance", "Date range",
+  "Bedrooms", "Amenities", "Level", "Duration", "Status", "Cuisine", "Stops", "Airlines",
+]
+export const MATRIX_MODES: Record<string, string> = { permissions: "roles and permissions with toggles", comparison: "side-by-side comparison of options" }
+export const COMPARE_SUBJECTS: Record<string, string> = { plans: "subscription plans", rooms: "hotel rooms", products: "products", cars: "cars" }
+export const TRIP_MODES: Record<string, string> = { flights: "flight results to choose from", trains: "train results to choose from", booked: "a booked trip's legs" }
+export const PASS_KINDS: Record<string, string> = { "boarding pass": "a flight boarding pass", "event ticket": "a concert or event ticket", coupon: "a discount coupon", membership: "a membership card" }
+export const INVITE_PURPOSES: Record<string, string> = { teammates: "teammates to a workspace", guests: "guests to an event", collaborators: "collaborators on a document", recipients: "email recipients" }
+export const BREAKDOWN_MEASURES: Record<string, string> = {
+  spending: "spending by category", budget: "budget used per category", portfolio: "portfolio allocation by asset",
+  time: "time spent per activity", nutrition: "calories and macros", traffic: "traffic by source",
+}
+export const BREAKDOWN_STYLES: Record<string, string> = { bars: "a bar per category", donut: "a donut chart with a legend" }
+export const WALLET_MODES: Record<string, string> = { cards: "saved payment cards", accounts: "bank accounts with balances" }
+export const STRIP_MODES: Record<string, string> = { stories: "stories with rings", contacts: "frequent contacts to pick from" }
+export const PEOPLE_ROLES: Record<string, string> = { speakers: "event speakers", team: "team members", instructors: "instructors or coaches", doctors: "doctors or therapists", judges: "judges or hosts" }
+export const CART_KINDS: Record<string, string> = { products: "products", food: "food and drinks", tickets: "tickets" }
+export const EDITOR_MODES: Record<string, string> = { document: "a document or notes page", email: "writing a new email", post: "writing a blog or social post" }
+export const ARTICLE_TYPES: Record<string, string> = { blog: "a blog post", legal: "terms or privacy policy", help: "a help center article", docs: "developer documentation" }
+export const WEEK_MODES: Record<string, string> = { calendar: "a personal or team calendar", classes: "a class or studio schedule", guide: "a TV or program guide" }
+export const CHOICE_MODES: Record<string, string> = { tickets: "ticket types with quantities", donation: "donation amounts", options: "package or plan options" }
+export const QUIZ_MODES: Record<string, string> = { question: "a quiz question with answers", flashcard: "a flashcard to flip", results: "quiz results and score" }
+export const CALL_MODES: Record<string, string> = { meeting: "a video meeting grid", preview: "camera check before joining" }
+export const READER_MODES: Record<string, string> = { email: "an open email", ticket: "a support ticket" }
+export const AMENITY_PLACES: Record<string, string> = { rental: "a home or rental", hotel: "a hotel", gym: "a gym or studio", office: "an office or coworking space", car: "a car" }
+export const THREAD_STYLES: Record<string, string> = { forum: "a forum post with replies", voting: "a post with upvotes and nested comments", qa: "a question with answers" }
+export const SCAN_TARGETS: Record<string, string> = { barcode: "a product barcode", "QR code": "a QR code", document: "a document or ID", receipt: "a receipt" }
+export const GAUGE_MEASURES: Record<string, string> = { BMI: "body mass index", "heart rate": "heart rate zone", "credit score": "credit score", "air quality": "air quality index", "password strength": "password strength" }
+export const DAY_TRACKS: Record<string, string> = { workouts: "workouts this week", habits: "habit check-ins", meals: "meals planned", sleep: "sleep per night" }
+export const LOG_SOURCES: Record<string, string> = { deployment: "a deployment or build", application: "application runtime", access: "HTTP access logs", audit: "an audit trail" }
+export const CONVERTER_UNITS: Record<string, string> = { currency: "currencies", length: "length", weight: "weight", temperature: "temperature", cooking: "cooking measures" }
+export const CLOCK_SETS: Record<string, string> = { world: "major cities worldwide", us: "US time zones", europe: "European cities", team: "where a remote team works" }
 
 // --- Atoms --------------------------------------------------------------------
 

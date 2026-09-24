@@ -30,6 +30,11 @@ walk: every component kind, prop and piece of copy is a choice over options we s
   (line charts need a time axis). A shard that fails every retry degrades to defaults, not a blank page.
 - `app/api/compose/route.ts` streams one NDJSON event per round, then `done`; it takes user swaps
   as `overrides` keyed `path|prop`.
+- `components/genui/kit.tsx` holds the shared render context, `useNode`, `Frame` and `Placeholder`;
+  `components/genui/primitives.tsx` holds the coverage-study primitives (`PRIMITIVE_VIEWS`), and
+  `app/primitives` renders every variant for visual QA. New primitives go there, plus a kind in
+  `types.ts`, a `KIND_INFO` entry with a use-case hint, a placement in `SECTIONS`/`PAGE_ORDER`/split,
+  and their questions in `detailQuestions`.
 - `components/genui/interpreter.tsx` maps nodes to shadcn components. Numbers, names and dates are
   not decisions; `lib/genui/sample.ts` seeds them from query + node path so they stay stable.
 - `components/inspector.tsx` shows every decision, set chips and clickable runners-up (swaps).

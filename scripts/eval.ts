@@ -187,7 +187,15 @@ async function run() {
   const base = arg("base", "http://localhost:3219")!
   const label = arg("label", "run")!
   const only = arg("only")
-  const suite = only ? SUITE.filter((s) => s.q.includes(only)) : SUITE
+  // --suite coverage: 3 prompts per category from the 200-prompt coverage corpus.
+  const suite =
+    arg("suite") === "coverage"
+      ? (() => {
+          const corpus = JSON.parse(readFileSync("evals/coverage/corpus.json", "utf8")) as { q: string; category: string }[]
+          const per = new Map<string, number>()
+          return corpus.filter((c) => { const n = per.get(c.category) ?? 0; per.set(c.category, n + 1); return n < 3 }).map((c) => ({ q: c.q, tag: "real" as const }))
+        })()
+      : only ? SUITE.filter((s) => s.q.includes(only)) : SUITE
   const out: Run[] = []
   const queue = [...suite]
   await Promise.all(
@@ -199,7 +207,7 @@ async function run() {
       }
     }),
   )
-  out.sort((x, y) => SUITE.findIndex((s) => s.q === x.q) - SUITE.findIndex((s) => s.q === y.q))
+  out.sort((x, y) => suite.findIndex((s) => s.q === x.q) - suite.findIndex((s) => s.q === y.q))
   mkdirSync("evals", { recursive: true })
   writeFileSync(`evals/${label}.json`, JSON.stringify(out, null, 1))
   const errs = out.filter((r) => !r.tree)

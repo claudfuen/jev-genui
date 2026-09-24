@@ -175,6 +175,25 @@ export const GRAMMAR: Partial<Record<Kind, Grammar>> = {
   },
 }
 
+/**
+ * Experiment (JEV_PAGE_MODE=set): pick page sections with one yes/no question per
+ * kind, laid out in this canonical order, instead of five competing slot choices.
+ * Generic containers (grid, card, split, tabs) are left out: asked one at a time,
+ * "would a card belong here?" is nearly always yes, which pads every page.
+ */
+export const PAGE_SET_MODE = process.env.JEV_PAGE_MODE === "set"
+export const PAGE_ORDER: Kind[] = [
+  "banner", "alert", "hero", "detail", "profile", "search", "stats", "steps", "board", "chat", "feed", "swipe",
+  "player", "video", "forecast", "listings", "gallery", "carousel", "form",
+  "timeslots", "chart", "table", "list", "map", "heatmap", "details", "settings", "calendar", "pricing", "comments",
+  "features", "logos", "testimonial", "timeline", "code", "keypad", "accordion", "empty", "button", "searchbox",
+  "otp", "upload", "cta", "footer",
+]
+const FAMILY_CONFLICTS: [string[], string[]][] = [
+  [["list"], ["table", "listings", "board", "chat", "player"]], [["table"], ["listings"]], [["gallery"], ["carousel", "listings"]],
+  [["carousel"], ["listings"]], [["detail"], ["listings", "form"]], [["hero"], ["banner"]],
+]
+
 /** Containers may only nest down to MAX_DEPTH - 1; deeper slots get leaves only. */
 export function allowedKinds(parent: UINode): Kind[] {
   const g = GRAMMAR[parent.kind]
@@ -240,6 +259,12 @@ export function detailQuestions(node: UINode, ctx: Ctx): DetailQuestion[] {
         choice("accent", "The accent color that best fits the mood of this request.", B.ACCENTS),
         choice("layout", "The overall frame of the page.", B.LAYOUTS),
       )
+      if (PAGE_SET_MODE) {
+        qs.push({
+          type: "set", prop: "sections", items: PAGE_ORDER, min: 1, max: 5, order: "bank", threshold: 0.5, conflicts: FAMILY_CONFLICTS,
+          ask: (k) => `Would a ${k} section (${KIND_INFO[k as Kind]}) belong on this page?`,
+        })
+      }
       break
     case "hero":
       qs.push(

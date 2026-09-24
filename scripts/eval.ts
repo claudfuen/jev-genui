@@ -14,6 +14,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { z } from "zod"
 
 import type { ComposeEvent, UINode } from "../lib/genui/types"
+import { visibleText } from "./render-text"
 
 const JUDGE = "anthropic/claude-sonnet-5"
 
@@ -40,7 +41,7 @@ export const SUITE: { q: string; tag: "real" | "edge" }[] = [
   ].map((q) => ({ q, tag: "edge" as const })),
 ]
 
-type Run = { q: string; tag: string; tree: UINode | null; ms: number; rounds: number; error?: string }
+type Run = { q: string; tag: string; tree: UINode | null; ms: number; rounds: number; error?: string; text?: string }
 
 function arg(name: string, fallback?: string) {
   const i = process.argv.indexOf(`--${name}`)
@@ -84,14 +85,16 @@ export function outline(n: UINode, pad = "", brand = ""): string {
 }
 
 const CONTEXT = `You are grading a generative UI sandbox. A person typed a request; a system composed a UI as a component tree.
-The system can only pick components and copy from fixed vocabularies, and it fills numbers, names and dates with plausible sample data (not shown).
-Kinds render as you would expect (stats = KPI tiles, board = kanban, chat = message thread, details = label/value rows, etc.).`
+Kinds render as you would expect (stats = KPI tiles, board = kanban, chat = message thread, details = label/value rows, etc.).
+You also get the page's visible text, in reading order, separated by |. It includes sample content (names, items, rows,
+messages) that people will read, so judge it too. Sidebar links may lead to other pages of the app.`
 
 const Grade = z.object({
   relevant: z.boolean().describe("The person would recognize this as what they asked for (for vague or nonsense input: a sensible, honest interpretation)."),
   core: z.boolean().describe("It contains the main component the request implies, e.g. a board for kanban, a thread for chat, a form for sign up."),
   copy: z.boolean().describe("Titles, labels and options fit the request's domain; nothing reads as the wrong product."),
   clean: z.boolean().describe("No redundant, contradictory or irrelevant sections, and nothing the request explicitly excluded."),
+  content: z.boolean().describe("The visible sample content (names, list items, table rows, cards, messages, prices) fits the request's domain and is internally consistent."),
   issue: z.string().describe("The single most important problem in one short sentence, or 'none'."),
 })
 
@@ -107,11 +110,11 @@ async function judge() {
   const runB: Run[] | null = b ? JSON.parse(readFileSync(`evals/${b}.json`, "utf8")) : null
 
   const grade = async (r: Run) => {
-    if (!r.tree) return { relevant: false, core: false, copy: false, clean: false, issue: `no UI: ${r.error}` }
+    if (!r.tree) return { relevant: false, core: false, copy: false, clean: false, content: false, issue: `no UI: ${r.error}` }
     const { object } = await generateObject({
       model: JUDGE,
       schema: Grade,
-      prompt: `${CONTEXT}\n\nRequest: ${JSON.stringify(r.q)}\n\nComposed UI:\n${outline(r.tree)}\n\nGrade each criterion strictly.`,
+      prompt: `${CONTEXT}\n\nRequest: ${JSON.stringify(r.q)}\n\nComposed UI:\n${outline(r.tree)}\n\nVisible text:\n${r.text ?? visibleText(r.tree, r.q.toLowerCase())}\n\nGrade each criterion strictly.`,
     })
     return object
   }
@@ -133,7 +136,7 @@ async function judge() {
           const { object } = await generateObject({
             model: JUDGE,
             schema: Pair,
-            prompt: `${CONTEXT}\n\nRequest: ${JSON.stringify(ra.q)}\n\nUI A:\n${outline(first.tree!)}\n\nUI B:\n${outline(second.tree!)}\n\nWhich UI better serves the request, judged on relevance, having the core component, domain-fitting copy and no junk? Answer tie only if they are genuinely equivalent.`,
+            prompt: `${CONTEXT}\n\nRequest: ${JSON.stringify(ra.q)}\n\nUI A:\n${outline(first.tree!)}\nVisible text A: ${first.text ?? visibleText(first.tree!, ra.q.toLowerCase(), 1500)}\n\nUI B:\n${outline(second.tree!)}\nVisible text B: ${second.text ?? visibleText(second.tree!, ra.q.toLowerCase(), 1500)}\n\nWhich UI better serves the request, judged on relevance, having the core component, domain-fitting copy and content, and no junk? Answer tie only if they are genuinely equivalent.`,
           })
           const winner = object.winner === "tie" ? "tie" : (object.winner === "A") !== flipped ? "A" : "B"
           pair = { winner, reason: object.reason, flipped } as const
@@ -146,13 +149,14 @@ async function judge() {
   rows.sort((x, y) => SUITE.findIndex((s) => s.q === x.q) - SUITE.findIndex((s) => s.q === y.q))
 
   const pass = (g?: z.infer<typeof Grade>) => !!g && g.relevant && g.core && g.copy && g.clean
+  const pass5 = (g?: z.infer<typeof Grade>) => pass(g) && !!g?.content
   const pct = (n: number, d: number) => `${Math.round((100 * n) / Math.max(d, 1))}%`
   const summarize = (label: string, pick: (r: (typeof rows)[number]) => z.infer<typeof Grade> | undefined, run: Run[]) => {
     const gs = rows.map(pick)
     const lat = run.filter((r) => r.tree).map((r) => r.ms).sort((x, y) => x - y)
-    const crit = (k: "relevant" | "core" | "copy" | "clean") => pct(gs.filter((g) => g?.[k]).length, gs.length)
+    const crit = (k: "relevant" | "core" | "copy" | "clean" | "content") => pct(gs.filter((g) => g?.[k]).length, gs.length)
     const fails = gs.filter((g) => !pass(g)).length
-    return `| ${label} | ${pct(gs.length - fails, gs.length)} | ${pct(fails, gs.length)} | ${crit("relevant")} | ${crit("core")} | ${crit("copy")} | ${crit("clean")} | ${lat[Math.floor(lat.length / 2)]}ms | ${lat[Math.floor(lat.length * 0.9)]}ms |`
+    return `| ${label} | ${pct(gs.length - fails, gs.length)} | ${pct(gs.filter(pass5).length, gs.length)} | ${crit("relevant")} | ${crit("core")} | ${crit("copy")} | ${crit("clean")} | ${crit("content")} | ${lat[Math.floor(lat.length / 2)]}ms | ${lat[Math.floor(lat.length * 0.9)]}ms |`
   }
 
   const lines = [
@@ -160,8 +164,8 @@ async function judge() {
     "",
     `${rows.length} prompts (${rows.filter((r) => r.tag === "real").length} realistic, ${rows.filter((r) => r.tag === "edge").length} edge cases). Judge: ${JUDGE}.`,
     "",
-    "| Version | Pass all 4 | Fail rate | Relevant | Core | Copy | Clean | p50 | p90 |",
-    "|---|---|---|---|---|---|---|---|---|",
+    "| Version | Pass 4 | Pass 5 (+content) | Relevant | Core | Copy | Clean | Content | p50 | p90 |",
+    "|---|---|---|---|---|---|---|---|---|---|",
     summarize(a, (r) => r.ga, runA),
     ...(runB ? [summarize(b!, (r) => r.gb, runB)] : []),
   ]
@@ -171,10 +175,10 @@ async function judge() {
   }
   lines.push("", "| Prompt | " + (runB ? `${a} | ${b} | Winner | Why` : `${a} | Issue`) + " |", runB ? "|---|---|---|---|---|" : "|---|---|---|")
   for (const r of rows) {
-    const mark = (g?: z.infer<typeof Grade>) => (pass(g) ? "pass" : `fail: ${g?.issue ?? "?"}`)
-    lines.push(runB ? `| ${r.q} | ${mark(r.ga)} | ${mark(r.gb)} | ${r.pair ? (r.pair.winner === "B" ? b : r.pair.winner === "A" ? a : "tie") : "-"} | ${r.pair?.reason ?? ""} |` : `| ${r.q} | ${pass(r.ga) ? "pass" : "fail"} | ${r.ga.issue} |`)
+    const mark = (g?: z.infer<typeof Grade>) => (pass5(g) ? "pass" : `fail: ${g?.issue ?? "?"}`)
+    lines.push(runB ? `| ${r.q} | ${mark(r.ga)} | ${mark(r.gb)} | ${r.pair ? (r.pair.winner === "B" ? b : r.pair.winner === "A" ? a : "tie") : "-"} | ${r.pair?.reason ?? ""} |` : `| ${r.q} | ${pass5(r.ga) ? "pass" : "fail"} | ${r.ga.issue} |`)
   }
-  const out = `evals/report-${a}${b ? `-vs-${b}` : ""}.md`
+  const out = `evals/report-${a}${b ? `-vs-${b}` : ""}${arg("tag") ? `-${arg("tag")}` : ""}.md`
   writeFileSync(out, lines.join("\n") + "\n")
   console.log(`\n${lines.slice(0, b ? 10 : 8).join("\n")}\n\nwrote ${out}`)
 }
@@ -202,5 +206,7 @@ async function run() {
   console.log(`\n${label}: ${out.length - errs.length}/${out.length} composed${errs.length ? `; errors: ${errs.map((e) => `${e.q}: ${e.error}`).join(" | ")}` : ""}`)
 }
 
-if (process.argv[2] === "judge") await judge()
-else await run()
+if ((import.meta as { main?: boolean }).main) {
+  if (process.argv[2] === "judge") await judge()
+  else await run()
+}

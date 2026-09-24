@@ -7,6 +7,7 @@ import {
   GRAMMAR,
   KIND_INFO,
   NONE,
+  PAGE_SET_MODE,
   allowedKinds,
   detailQuestions,
   followUpQuestions,
@@ -572,6 +573,20 @@ export async function compose(
             .filter((n) => !n.pending)
             .flatMap((node) => followUpQuestions(node).map((d) => ({ node, d })))
         : []
+    // Set mode: once the proposed sections exist, each one is asked whether it adds
+    // something the others do not. This is the joint check independent yes/no
+    // questions cannot make, and it rides along with the round that asks details.
+    const pruneKeys = new Map<string, string>()
+    if (PAGE_SET_MODE && round === 2 && root.children.length > 1) {
+      const names = root.children.map((c) => c.kind)
+      for (const c of root.children) {
+        const key = `${c.id}_keep`
+        const others = names.filter((k) => k !== c.kind).join(", ")
+        const instructions = `The page has these sections: ${names.join(", ")}. Does the ${c.kind} section add something important for the request that ${others} do not already cover?`
+        qs.push({ key, options: 0, cost: costOf(instructions), question: { type: "boolean", instructions } })
+        pruneKeys.set(c.id, key)
+      }
+    }
     const asks = [
       ...frontier.flatMap((node) =>
         detailQuestions(node, {
@@ -609,7 +624,7 @@ export async function compose(
     }
     for (const node of frontier) {
       const g = GRAMMAR[node.kind]
-      if (g) {
+      if (g && !(PAGE_SET_MODE && node.kind === "page")) {
         const criteria: Record<string, string | null> = {}
         if (g.noneAllowed) criteria[NONE] = KIND_INFO.none
         for (const k of allowedKinds(node)) criteria[k] = KIND_INFO[k]
@@ -637,6 +652,37 @@ export async function compose(
       applyChoices(pending, res.answers, overrides, used)
       applySets(pending, res.answers)
       repair(pending, res.answers)
+      if (pruneKeys.size) {
+        const scored = root.children.map((c) => ({ c, p: res.answers.get(pruneKeys.get(c.id)!)?.probability ?? 1 }))
+        const best = scored.reduce((a, b) => (b.p > a.p ? b : a))
+        const keep = scored.filter((x) => x.p >= 0.5 || x === best).map((x) => x.c)
+        const dropped = root.children.filter((c) => !keep.includes(c))
+        if (dropped.length) {
+          root.children = keep
+          root.decisions.push({ prop: "pruned", choice: dropped.map((d) => d.kind).join(", "), probability: null, alternatives: [], note: "sections Jev judged redundant next to the others" })
+          const renumber = (n: UINode, path: string) => {
+            n.path = path
+            n.children.forEach((c, i) => renumber(c, `${path}.${i + 1}`))
+          }
+          root.children.forEach((c, i) => renumber(c, `${i + 1}`))
+          const gone = new Set(dropped.flatMap((d) => walk(d)))
+          frontier = frontier.filter((n) => !gone.has(n))
+        }
+      }
+      // Set mode: the page's sections came from yes/no questions, already in canonical order.
+      if (PAGE_SET_MODE && frontier.includes(root) && Array.isArray(root.props.sections)) {
+        const rated = root.decisions.find((d) => d.prop === "sections")?.set ?? []
+        root.children = (root.props.sections as string[]).map((k, i) => {
+          const child = makeNode(k as Kind, root, i, ids++)
+          const p = rated.find((r) => r.item === k)?.p ?? null
+          child.decisions.push({ prop: "kind", choice: k, probability: p, alternatives: [] })
+          parents.set(child.id, root)
+          return child
+        })
+        delete root.props.sections
+        root.pendingSlots = 0
+        next.push(...root.children)
+      }
       for (const node of frontier) {
         const keys = slotKeys.get(node.id)
         if (!keys) continue

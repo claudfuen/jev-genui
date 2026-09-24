@@ -1,0 +1,21 @@
+scripts/coverage.ts
+  s_f70fe91dfb9759::t_4d698321b34a3a 1-33,35-44,46-116,121-124,130-132,135-216
+components/genui/primitives.tsx
+  s_f70fe91dfb9759::t_848749d54aa6b0 4-446,448,450,452,454-566,568,570,573,575-620,622-641,643-759,761-849,851,853-1352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "053121c797a79583fb0870720656e61977ac8401",
+  "prompts": {},
+  "sessions": {
+    "s_f70fe91dfb9759": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72a6def1-9a16-4f27-8058-abc080d286b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Claudio Fuentes <imclaudfuen@gmail.com>"
+    }
+  }
+}
